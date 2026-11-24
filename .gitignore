@@ -1,0 +1,20 @@
+# Auxiliares de LaTeX
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.log
+*.out
+*.toc
+*.run.xml
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+
+# Python
+__pycache__/
+*.pyc
+
+# Datos de Elliptic (no se distribuyen)
+Fundamentos_Matematicos_GNN.zip
+data/
