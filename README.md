@@ -13,7 +13,7 @@ Elliptic, que contiene transacciones de bitcoin.
 ## Contenido
 
 - `informe/`: informe final. Incluye la fuente `PNL_Indice_Integrado.tex`, el
-  PDF compilado, la bibliografía y las figuras.
+  PDF compilado y la bibliografía; las figuras están en `informe/figuras/`.
 - `codigo/`:
   - `gcn_elliptic_lbfgs.py`: L-BFGS (Andrei, 2020, Algoritmo 1.6) y el método
     del gradiente con Wolfe sobre Elliptic.
