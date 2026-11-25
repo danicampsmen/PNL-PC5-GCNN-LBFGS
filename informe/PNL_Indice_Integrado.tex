@@ -1316,13 +1316,6 @@ h_{:,d_\ell}^{(\ell)}\bigr]
 \in\mathbb R^{n\times d_\ell}.
 \]
 
-Esta matriz tiene $n$ filas, correspondientes a los
-vértices del grafo, y $d_\ell$ columnas,
-correspondientes a sus características o canales.
-En particular, $h_{:,f}^{(\ell)}\in\mathbb R^n$
-es la columna $f$-ésima, que contiene los valores
-de la característica $f$ para todos los vértices.
-
 Por otra parte, denotamos por $h_i^{(\ell)}$
 el vector fila que contiene las $d_\ell$
 características del vértice $v_i$:
@@ -1341,17 +1334,10 @@ h_n^{(\ell)}
 La matriz inicial es
 $H^{(0)}=X\in\mathbb R^{n\times d_0}$,
 ya definida en la Sección~\ref{sec:grafos}.
-Para $\ell\geq 1$, $H^{(\ell)}$ representa
-la salida de la capa $\ell$ y, si
-$\ell<L_{\mathrm{net}}$, constituye la entrada
-de la capa siguiente.
 
 \end{definicion}
 
-\newpage
-
-
-\begin{figure}[htbp]
+\begin{figure}[H]
     \centering
 
     % Parte A: Representación por capas
@@ -1377,6 +1363,21 @@ de la capa siguiente.
     vértices y canales.}
 
     \label{fig:representacion_multicanal}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}[t]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{transformacion_representaciones.png}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[t]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{representacion_R3_R2.png}
+    \end{minipage}
+    \caption{Ejemplos de transformación de representaciones de tres a dos características.}
+    \label{fig:transformacion-representaciones}
 \end{figure}
 
 
@@ -1409,300 +1410,58 @@ En particular, para $k=0$ se tiene $M_0^{(\ell)}=H^{(\ell-1)}$ y $m_{0,i}^{(\ell
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]
-    {\detokenize{Agregación multiescala en grafos neuronales.png}}
-    \caption{Agregación de información de los vértices
-    y construcción de matrices agregadas multiescala (en el diagrama, $m$ abrevia el orden máximo $K_\ell$, $N_k(1)$ lista los vértices de la vecindad de $k$ saltos —con $k=2,3$ e $i=1$ en $(S^k)_{ij}$ en las dos últimas columnas— y la combinación ponderada del panel B produce primero la salida lineal $Z^{(\ell)}$ previa a $\sigma_\ell$).}
+    \includegraphics[width=\textwidth,height=0.60\textheight,keepaspectratio]{propagacion_por_saltos.png}
+    \caption{Propagación de información por saltos en una red.}
     \label{fig:agregacion-multiescala}
 \end{figure}
 
-
 \begin{definicion}[Banco de filtros convolucionales multicanal]
 \label{def:gcnn-banco}
-Fijemos $\ell\in\{1,\ldots,L_{\mathrm{net}}\}$, $K_\ell\in\mathbb N_0$ y las matrices de parámetros entrenables
-$W_k^{(\ell)}\in\mathbb R^{d_{\ell-1}\times d_\ell}$, para $k=0,\ldots,K_\ell$.
+Fijemos $\ell\in\{1,\ldots,L_{\mathrm{net}}\}$, $K_\ell\in\mathbb N_0$ y las matrices de parámetros entrenables $W_k^{(\ell)}\in\mathbb R^{d_{\ell-1}\times d_\ell}$, para $k=0,\ldots,K_\ell$.
 
-Para cada característica de entrada $g\in\{1,\ldots,d_{\ell-1}\}$ y característica de salida $f\in\{1,\ldots,d_\ell\}$, se define el filtro polinomial
+Para cada canal $g\in\{1,\ldots,d_{\ell-1}\}$ de la matriz de entrada $H^{(\ell-1)}$ y canal $f\in\{1,\ldots,d_\ell\}$ de la matriz de salida $H^{(\ell)}$, se define el filtro polinomial
 \[
-\mathcal H_{gf}^{(\ell)}(S)
-:=\sum_{k=0}^{K_\ell}(W_k^{(\ell)})_{gf}S^k
-\in\mathbb R^{n\times n}.
+\mathcal H_{gf}^{(\ell)}(S):=\sum_{k=0}^{K_\ell}(W_k^{(\ell)})_{gf}S^k\in\mathbb R^{n\times n}.
 \]
-Cada $\mathcal H_{gf}^{(\ell)}(S)$ es un filtro FIR del tipo definido en la Sección~\ref{sec:filtros}, pues combina distintas potencias del operador de desplazamiento $S$ mediante coeficientes específicos del par de características $(g,f)$.
+Se denomina \emph{banco de filtros} de la capa $\ell$ a la colección de los $d_{\ell-1}d_\ell$ filtros $\mathcal H_{gf}^{(\ell)}(S)$.
+El banco de filtros expresa las transformaciones que nuestra red aprende entre los canales de entrada y salida.
 
-Se denomina \emph{banco de filtros} de la capa $\ell$ a la colección de los $d_{\ell-1}d_\ell$ filtros $\mathcal H_{gf}^{(\ell)}(S)$ y es la forma de expresar las transformaciones que nuestra red aprende entre los canales de entrada y salida. Para cada escala $k$, la matriz $W_k^{(\ell)}$ reúne los coeficientes correspondientes a todos los pares de características de entrada y salida.
+Para cada $f\in\{1,\ldots,d_\ell\}$, se define
+\[
+Z_{:,f}^{(\ell)}:=\sum_{g=1}^{d_{\ell-1}}\mathcal H_{gf}^{(\ell)}(S)h_{:,g}^{(\ell-1)}\in\mathbb R^n.
+\]
+Es decir, cada columna se obtiene aplicando los filtros correspondientes a los canales de entrada y sumando sus resultados.
 
-Al aplicar este banco de filtros a la matriz de características $H^{(\ell-1)}$, se obtiene la matriz
+De esta manera, se construye la matriz $Z^{(\ell)}:=[Z_{:,1}^{(\ell)},\ldots,Z_{:,d_\ell}^{(\ell)}]\in\mathbb R^{n\times d_\ell}$, denominada \emph{salida lineal del banco de filtros}. Equivalentemente, esta matriz puede expresarse como
 \begin{equation}\label{eq:gcnn-preactivacion}
-Z^{(\ell)}
-:=\sum_{k=0}^{K_\ell}M_k^{(\ell)}W_k^{(\ell)}
-=\sum_{k=0}^{K_\ell}S^kH^{(\ell-1)}W_k^{(\ell)},
+Z^{(\ell)}=\sum_{k=0}^{K_\ell}S^kH^{(\ell-1)}W_k^{(\ell)}=\sum_{k=0}^{K_\ell}M_k^{(\ell)}W_k^{(\ell)}.
 \end{equation}
-denominada \emph{salida lineal del banco de filtros}. Dado que
-$M_k^{(\ell)}\in\mathbb R^{n\times d_{\ell-1}}$ y
-$W_k^{(\ell)}\in\mathbb R^{d_{\ell-1}\times d_\ell}$, se tiene
-$Z^{(\ell)}\in\mathbb R^{n\times d_\ell}$.
-
-Las filas de $Z^{(\ell)}$ corresponden a los vértices del grafo, mientras que sus columnas corresponden a las $d_\ell$ características o canales de salida. En particular, para cada $f\in\{1,\ldots,d_\ell\}$, la columna
-$Z_{:,f}^{(\ell)}\in\mathbb R^n$ contiene los valores de la característica de salida $f$ para todos los vértices.
-
-Esta columna puede expresarse mediante los filtros FIR individuales del banco:
-\[
-Z_{:,f}^{(\ell)}
-=\sum_{g=1}^{d_{\ell-1}}
-\mathcal H_{gf}^{(\ell)}(S)\,
-h_{:,g}^{(\ell-1)},
-\]
-donde $h_{:,g}^{(\ell-1)}\in\mathbb R^n$ es la columna correspondiente a la característica de entrada $g$. Por tanto, cada columna de salida se obtiene sumando los resultados de aplicar los filtros asociados a las distintas características de entrada.
-
-Finalmente, para cada vértice $v_i$, con $i\in\{1,\ldots,n\}$, y cada canal de salida $f\in\{1,\ldots,d_\ell\}$, el elemento correspondiente de $Z^{(\ell)}$ está dado por
-\[
-Z_{if}^{(\ell)}
-=\sum_{k=0}^{K_\ell}
-\sum_{j\in N_k(i)}
-\sum_{g=1}^{d_{\ell-1}}
-(S^k)_{ij}H_{jg}^{(\ell-1)}(W_k^{(\ell)})_{gf}.
-\]
-Esta expresión muestra cómo las características de los vértices situados a lo sumo a $k$ saltos de $v_i$, ponderadas por los coeficientes de $S^k$ y los parámetros entrenables $W_k^{(\ell)}$, contribuyen al valor del canal de salida $f$ del vértice $v_i$.
-
 \end{definicion}
 
-
-\begin{ejemplo}[Transformaciones determinadas por un banco de filtros FIR]
-\label{ej:gcnn-banco-filtros}
-
-El banco de filtros es la forma de expresar las transformaciones
-que nuestra red aprende entre los canales de entrada y salida.
-
-Para ilustrar esta afirmación, consideremos una capa $\ell$ con $n=4$ vértices, $d_{\ell-1}=2$ canales de entrada, $d_\ell=1$ canal de salida y orden máximo de propagación $K_\ell=1$.
-
-La matriz de características de entrada es
-\[
-H^{(\ell-1)}
-=
-\begin{pmatrix}
-9&0\\
-0&6\\
-0&0\\
-0&0
-\end{pmatrix}
-\in\mathbb R^{4\times 2},
-\]
-cuyas columnas son
-\[
-h_{:,1}^{(\ell-1)}
-=
-\begin{pmatrix}9\\0\\0\\0\end{pmatrix},
-\qquad
-h_{:,2}^{(\ell-1)}
-=
-\begin{pmatrix}0\\6\\0\\0\end{pmatrix}.
-\]
-
-Consideremos el operador de desplazamiento normalizado
-\[
-S=\frac13
-\begin{pmatrix}
-1&1&0&1\\
-1&1&1&0\\
-0&1&1&1\\
-1&0&1&1
-\end{pmatrix}.
-\]
-
-Dado que $K_\ell=1$, para cada canal de entrada
-$g\in\{1,2\}$ y el único canal de salida $f=1$,
-los filtros FIR tienen la forma
-\[
-\mathcal H_{g1}^{(\ell)}(S)
-=
-(W_0^{(\ell)})_{g1}I_4
-+
-(W_1^{(\ell)})_{g1}S,
-\]
-donde $I_4$ representa la matriz identidad de orden cuatro.
-
-\medskip
-\noindent\textbf{Primera configuración de parámetros.}
-
-Supongamos que las matrices de parámetros entrenables
-toman los valores
-\[
-W_0^{(\ell)}
-=
-\begin{pmatrix}1\\0\end{pmatrix},
-\qquad
-W_1^{(\ell)}
-=
-\begin{pmatrix}0\\1\end{pmatrix}.
-\]
-
-Para el primer canal de entrada, $g=1$, se obtiene
+\noindent\textbf{Justificación de la expresión matricial.}
+Para cada $f\in\{1,\ldots,d_\ell\}$, se tiene
 \[
 \begin{aligned}
-\mathcal H_{11}^{(\ell)}(S)
-&=(W_0^{(\ell)})_{11}I_4
- +(W_1^{(\ell)})_{11}S=1I_4+0S=I_4.
+Z_{:,f}^{(\ell)}
+&=\sum_{g=1}^{d_{\ell-1}}\mathcal H_{gf}^{(\ell)}(S)h_{:,g}^{(\ell-1)}\\
+&=\sum_{g=1}^{d_{\ell-1}}\sum_{k=0}^{K_\ell}(W_k^{(\ell)})_{gf}S^kh_{:,g}^{(\ell-1)}\\
+&=\sum_{k=0}^{K_\ell}S^k\underbrace{\left(\sum_{g=1}^{d_{\ell-1}}(W_k^{(\ell)})_{gf}h_{:,g}^{(\ell-1)}\right)}_{(H^{(\ell-1)}W_k^{(\ell)})_{:,f}}\\
+&=\left(\sum_{k=0}^{K_\ell}S^kH^{(\ell-1)}W_k^{(\ell)}\right)_{:,f}.
 \end{aligned}
 \]
 
-De manera análoga, para el segundo canal de entrada,
-$g=2$, resulta
-\[
-\begin{aligned}
-\mathcal H_{21}^{(\ell)}(S)
-&=(W_0^{(\ell)})_{21}I_4
- +(W_1^{(\ell)})_{21}S=0I_4+1S=S.
-\end{aligned}
-\]
-
-Por tanto, las transformaciones lineales determinadas
-por los filtros son
-$\mathcal H_{11}^{(\ell)}(S)=I_4$ y
-$\mathcal H_{21}^{(\ell)}(S)=S$.
-
-Al aplicar el primer filtro a su correspondiente
-columna de entrada, obtenemos
-\[
-\mathcal H_{11}^{(\ell)}(S)h_{:,1}^{(\ell-1)}
-=
-I_4\begin{pmatrix}9\\0\\0\\0\end{pmatrix}
-=
-\begin{pmatrix}9\\0\\0\\0\end{pmatrix}.
-\]
-
-Para el segundo filtro, se tiene
-\[
-\begin{aligned}
-\mathcal H_{21}^{(\ell)}(S)h_{:,2}^{(\ell-1)}
-&=
-\frac13
-\begin{pmatrix}
-1&1&0&1\\
-1&1&1&0\\
-0&1&1&1\\
-1&0&1&1
-\end{pmatrix}
-\begin{pmatrix}0\\6\\0\\0\end{pmatrix}=
-\frac13
-\begin{pmatrix}6\\6\\6\\0\end{pmatrix}
-=
-\begin{pmatrix}2\\2\\2\\0\end{pmatrix}.
-\end{aligned}
-\]
-
-Como $d_\ell=1$, la salida lineal del banco de filtros
-está constituida por una única columna:
-\[
-\begin{aligned}
-Z^{(\ell)}
-&=Z_{:,1}^{(\ell)}=
-\mathcal H_{11}^{(\ell)}(S)h_{:,1}^{(\ell-1)}
-+
-\mathcal H_{21}^{(\ell)}(S)h_{:,2}^{(\ell-1)}=
-\begin{pmatrix}9\\0\\0\\0\end{pmatrix}
-+
-\begin{pmatrix}2\\2\\2\\0\end{pmatrix}
-=
-\begin{pmatrix}11\\2\\2\\0\end{pmatrix}.
-\end{aligned}
-\]
-
-\medskip
-\noindent\textbf{Segunda configuración de parámetros.}
-
-Supongamos ahora que, como consecuencia de un ajuste
-de los parámetros durante el entrenamiento, las matrices
-anteriores son reemplazadas por
-\[
-\widetilde W_0^{(\ell)}
-=
-\begin{pmatrix}0\\1\end{pmatrix},
-\qquad
-\widetilde W_1^{(\ell)}
-=
-\begin{pmatrix}1\\0\end{pmatrix}.
-\]
-
-Los nuevos filtros quedan determinados por
-\[
-\begin{aligned}
-\widetilde{\mathcal H}_{11}^{(\ell)}(S)
-&=(\widetilde W_0^{(\ell)})_{11}I_4
- +(\widetilde W_1^{(\ell)})_{11}S=0I_4+1S=S,\\[2mm]
-\widetilde{\mathcal H}_{21}^{(\ell)}(S)
-&=(\widetilde W_0^{(\ell)})_{21}I_4
- +(\widetilde W_1^{(\ell)})_{21}S=1I_4+0S=I_4.
-\end{aligned}
-\]
-
-En consecuencia, las transformaciones han cambiado:
-ahora el primer filtro agrega la información a un
-salto, mientras que el segundo conserva la segunda
-columna de entrada.
-
-Calculamos nuevamente las contribuciones:
-\[
-\begin{aligned}
-\widetilde{\mathcal H}_{11}^{(\ell)}(S)
-h_{:,1}^{(\ell-1)}
-&=
-\frac13
-\begin{pmatrix}
-1&1&0&1\\
-1&1&1&0\\
-0&1&1&1\\
-1&0&1&1
-\end{pmatrix}
-\begin{pmatrix}9\\0\\0\\0\end{pmatrix}=
-\frac13
-\begin{pmatrix}9\\9\\0\\9\end{pmatrix}
-=
-\begin{pmatrix}3\\3\\0\\3\end{pmatrix},
-\end{aligned}
-\]
-y
-\[
-\widetilde{\mathcal H}_{21}^{(\ell)}(S)
-h_{:,2}^{(\ell-1)}
-=
-I_4\begin{pmatrix}0\\6\\0\\0\end{pmatrix}
-=
-\begin{pmatrix}0\\6\\0\\0\end{pmatrix}.
-\]
-
-Por tanto, la nueva salida lineal es
-\[
-\begin{aligned}
-\widetilde Z^{(\ell)}
-&=
-\widetilde{\mathcal H}_{11}^{(\ell)}(S)
-h_{:,1}^{(\ell-1)}
-+
-\widetilde{\mathcal H}_{21}^{(\ell)}(S)
-h_{:,2}^{(\ell-1)}=
-\begin{pmatrix}3\\3\\0\\3\end{pmatrix}
-+
-\begin{pmatrix}0\\6\\0\\0\end{pmatrix}
-=
-\begin{pmatrix}3\\9\\0\\3\end{pmatrix}.
-\end{aligned}
-\]
-
-En ambas configuraciones se han mantenido fijos
-el operador de desplazamiento $S$ y la matriz
-de entrada $H^{(\ell-1)}$. Sin embargo, al modificar
-los parámetros $W_k^{(\ell)}$, cambian los filtros
-$\mathcal H_{g1}^{(\ell)}(S)$ y, por consiguiente,
-la salida lineal de la capa.
-
-\end{ejemplo}
-\newpage
-\begin{figure}[htbp]
+\begin{figure}[H]
     \centering
-    \includegraphics[width=1\linewidth]{infografía_de_filtros_fir_en_grafos.png}
-    \caption{Filtro FIR individual y banco de filtros convolucionales multicanal sobre un grafo (en el diagrama, $N=n$ denota el número de vértices, $h_i^{(g)}$ abrevia la entrada $H_{ig}^{(\ell-1)}$ del canal $g$, y $Z_*=Z^{(\ell)}$ denota la salida lineal de la capa).}
+    \includegraphics[width=\textwidth,height=0.60\textheight,keepaspectratio]{que_aprende_la_red.png}
+    \caption{Parámetros entrenables y transformaciones determinadas por el banco de filtros.}
     \label{fig:filtros-fir-grafos}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth,height=0.60\textheight,keepaspectratio]{aplicacion_banco_filtros.png}
+    \caption{Aplicación del banco de filtros a los canales de entrada.}
+    \label{fig:aplicacion-banco-filtros}
 \end{figure}
 
 \begin{definicion}[Operador de actualización]
@@ -1732,11 +1491,8 @@ Las expresiones matricial y por vértice describen la misma operación: la prime
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]
-    {\detokenize{infografía_del_operador_gcnn_en_español.png}}
-    \caption{Operador de actualización en una capa GCNN:
-    (a) actualización de las características de un vértice;
-    (b) actualización matricial de toda la capa.}
+    \includegraphics[width=\textwidth,height=0.60\textheight,keepaspectratio]{update_ejemplo_numerico.png}
+    \caption{Ejemplo numérico de agregación y actualización de las características del vértice $v_1$.}
     \label{fig:gcnn-update}
 \end{figure}
 
@@ -1789,11 +1545,8 @@ Por construcción, $\Phi(X;S,\theta)=H^{(L_{\mathrm{net}})}$.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]
-    {\detokenize{arquitectura_GCNN_composicion_sin_recuadros.png}}
-    \caption{Arquitectura de una red neuronal convolucional
-    multicanal sobre grafos, construida mediante la composición
-    de capas convolucionales.}
+    \includegraphics[width=\textwidth,height=0.60\textheight,keepaspectratio]{composicion_capas_gcnn.png}
+    \caption{Composición de capas en una GCNN.}
     \label{fig:arquitectura-gcnn}
 \end{figure}
 
@@ -1866,7 +1619,7 @@ p_n(\theta)
 
 \begin{proposicion}[Número de parámetros entrenables]
 \label{prop:gcnn-parametros}
-La red de la Definición~\ref{def:gcnn-red} contiene
+La red anterior contiene
 \[
 p=\sum_{\ell=1}^{L_{\mathrm{net}}}(K_\ell+1)d_{\ell-1}d_\ell
 \]
@@ -1876,52 +1629,6 @@ parámetros escalares entrenables.
 \begin{proof}
 Para cada capa $\ell$, existen $K_\ell+1$ matrices de parámetros $W_0^{(\ell)},\ldots,W_{K_\ell}^{(\ell)}$. Cada matriz pertenece a $\mathbb R^{d_{\ell-1}\times d_\ell}$ y contiene $d_{\ell-1}d_\ell$ entradas. Por tanto, la capa $\ell$ contiene $(K_\ell+1)d_{\ell-1}d_\ell$ parámetros escalares. Sumando sobre todas las capas se obtiene la expresión afirmada.
 \end{proof}
-
-\begin{ejemplo}[Capa multiescala de orden dos]
-\label{ej:gcnn-multiescala-orden-dos}
-Consideremos, para ilustrar el cálculo de una capa, el grafo de tres vértices con matriz de adyacencia
-\[
-A=\begin{pmatrix}
-0&2&0\\2&0&1\\0&1&0
-\end{pmatrix}.
-\]
-Se trata de un ejemplo independiente del grafo de nueve vértices utilizado en el capítulo anterior. Su operador normalizado, obtenido mediante la Definición~\ref{def:desplazamiento-normalizado}, y su matriz de características inicial son
-\[
-S=\begin{pmatrix}
-\frac13&\frac1{\sqrt3}&0\\
-\frac1{\sqrt3}&\frac14&\frac1{\sqrt8}\\
-0&\frac1{\sqrt8}&\frac12
-\end{pmatrix},
-\qquad
-H^{(0)}=\begin{pmatrix}1&0\\0&1\\1&1\end{pmatrix}.
-\]
-Tomemos $K_1=2$, $d_0=d_1=2$ y matrices de parámetros
-\[
-W_0^{(1)}=\begin{pmatrix}1&0\\0&1\end{pmatrix},\quad
-W_1^{(1)}=\begin{pmatrix}1&0\\0&2\end{pmatrix},\quad
-W_2^{(1)}=\begin{pmatrix}0&1\\1&0\end{pmatrix}.
-\]
-Se calculan las tres agregaciones $M_0^{(1)}=H^{(0)}$, $M_1^{(1)}=SH^{(0)}$ y $M_2^{(1)}=S^2H^{(0)}$. La salida lineal es $Z^{(1)}=M_0^{(1)}W_0^{(1)}+M_1^{(1)}W_1^{(1)}+M_2^{(1)}W_2^{(1)}$.
-
-Calculando las dos matrices no triviales de agregación, obtenemos (con redondeo a cuatro decimales)
-\[
-M_1^{(1)}\approx\begin{pmatrix}
-0{,}3333&0{,}5774\\0{,}9309&0{,}6036\\0{,}5000&0{,}8536
-\end{pmatrix},\qquad
-M_2^{(1)}\approx\begin{pmatrix}
-0{,}6486&0{,}5409\\0{,}6020&0{,}7860\\0{,}5791&0{,}6402
-\end{pmatrix}.
-\]
-Por tanto,
-\[
-Z^{(1)}\approx\begin{pmatrix}
-1{,}8742&1{,}8033\\1{,}7169&2{,}8091\\2{,}1402&3{,}2862
-\end{pmatrix}.
-\]
-Tomando $\sigma_1=\operatorname{ReLU}$, resulta $H^{(1)}=\operatorname{ReLU}(Z^{(1)})=Z^{(1)}$, pues todas las entradas de $Z^{(1)}$ son positivas.
-
-El cálculo utiliza las escalas $k=0,1,2$ de la arquitectura general.
-\end{ejemplo}
 
 \chapter{Formulación del problema de optimización}
 
@@ -2139,7 +1846,7 @@ Como $I_{\mathrm{tr}}$ es finito y $m>0$, se obtiene
 Esto concluye la demostración.
 \end{proof}
 
-\section{Problema de entrenamiento}\label{sec:problema-entrenamiento}
+\section{Formulación del problema de optimización}\label{sec:problema-entrenamiento}
 
 El entrenamiento de la GCNN se plantea como el siguiente problema de optimización no restringida:
 
@@ -2320,7 +2027,7 @@ positiva, se tiene
 Por tanto, $d_k$ es una dirección de descenso en $\theta_k$.
 \end{proof}
 
-\begin{observacion}[Condición de curvatura]
+\begin{observacion}
 \label{obs:curvatura-bfgs}
 Por la definición de $s_k$ e $y_k$, se tiene
 \[
@@ -2826,33 +2533,35 @@ realizamos los siguientes pasos.
 
 Inicializamos el vector
 \[
-    q=g_k.
+    q^{(\ell_k)}=g_k.
 \]
 
 Recorremos los índices
 \[
-    i=k-1,k-2,\ldots,k-\ell_k.
+    j=\ell_k-1,\ldots,0,
+    \qquad i=k-\ell_k+j.
 \]
 
-Para cada índice $i$, calculamos
+Para cada índice $j$, calculamos
 \[
-    a_i=\rho_i s_i^\top q
+    a_i=\rho_i s_i^\top q^{(j+1)}
 \]
 y actualizamos
 \[
-    q\leftarrow q-a_i y_i.
+    q^{(j)}=q^{(j+1)}-a_i y_i.
 \]
 
 Conservamos los valores de $a_i$ obtenidos durante
-este bucle (el vector $q$ se sobrescribe en memoria, recorriendo sucesivamente $q^{(\ell_k)},\ldots,q^{(0)}$ de la Proposición~\ref{prop:producto-lbfgs}).
+este bucle.
 
 \medskip
 
-\noindent\textbf{Paso 2. Cálculo de $r$.}
+\noindent\textbf{Paso 2. Cálculo de $r^{(0)}$.}
 
-Utilizando el último valor de $q$, calculamos
+Utilizando el último valor de $q$ obtenido en el primer bucle,
+calculamos
 \[
-    r=\gamma_k q.
+    r^{(0)}=H_k^{(0)}q^{(0)}=\gamma_k q^{(0)}.
 \]
 
 \medskip
@@ -2861,16 +2570,17 @@ Utilizando el último valor de $q$, calculamos
 
 Recorremos los índices
 \[
-    i=k-\ell_k,\ldots,k-1.
+    j=0,\ldots,\ell_k-1,
+    \qquad i=k-\ell_k+j.
 \]
 
-Para cada índice $i$, calculamos
+Para cada índice $j$, calculamos
 \[
-    b_i=\rho_i y_i^\top r
+    b_i=\rho_i y_i^\top r^{(j)}
 \]
 y actualizamos
 \[
-    r\leftarrow r+s_i(a_i-b_i),
+    r^{(j+1)}=r^{(j)}+s_i(a_i-b_i),
 \]
 donde $a_i$ es el valor correspondiente obtenido
 en el primer bucle.
@@ -2878,7 +2588,7 @@ en el primer bucle.
 Por la Proposición \ref{prop:producto-lbfgs},
 al finalizar el segundo bucle se cumple
 \[
-    r=H_k g_k.
+    r^{(\ell_k)}=H_k g_k.
 \]
 
 \medskip
@@ -2888,7 +2598,7 @@ siguiente iterado.}
 
 Tomamos
 \[
-    d_k=-r.
+    d_k=-r^{(\ell_k)}.
 \]
 
 Por la Proposición \ref{prop:propiedades-lbfgs},
@@ -2960,7 +2670,7 @@ y regresamos al Paso 1.
 
 \end{algoritmo}
 
-\begin{observacion}[Condición de curvatura en L-BFGS]
+\begin{observacion}
 \label{obs:curvatura-lbfgs}
 
 La elección de los tamaños de paso en el
@@ -2977,14 +2687,20 @@ generadas son de descenso mientras $g_k\neq 0$.
 % Procedencia: ejemplo construido (IA, Claude, 2026-11-23); números verificados
 % con aritmética exacta en codigo/ejemplos_verificables.py (ejemplo H). review_pending.
 \begin{ejemplo}[Recursión de dos lazos con memoria $M=1$]\label{ej:dos-lazos}
-Sea $p=2$ y supóngase almacenado un único par $s=(1,0)^\top$, $y=(2,1)^\top$, de modo que $s^\top y=2$, $\rho=\frac12$ y, por~\eqref{eq:lbfgs-escalado}, $\gamma=s^\top y/\|y\|_2^2=\frac25$. Para $g=(1,1)^\top$, el Algoritmo~\ref{alg:lbfgs} (Proposición~\ref{prop:producto-lbfgs}) con $\ell_k=1$ realiza:
+Sea $p=2$ y supóngase almacenado un único par $s=(1,0)^\top$, $y=(2,1)^\top$, de modo que $s^\top y=2$, $\rho=\frac12$ y, por~\eqref{eq:lbfgs-escalado}, $\gamma=s^\top y/\|y\|_2^2=\frac25$. Para $g=(1,1)^\top$, el Algoritmo~\ref{alg:lbfgs} (Proposición~\ref{prop:producto-lbfgs}) con $\ell_k=1$ y $q^{(1)}=g$ realiza:
 \[
-a=\rho\,s^\top g=\tfrac12,\quad q=g-a\,y=\bigl(0,\tfrac12\bigr)^\top,\quad r=\gamma q=\bigl(0,\tfrac15\bigr)^\top,\quad b=\rho\,y^\top r=\tfrac1{10},\quad r\gets r+(a-b)s=\bigl(\tfrac25,\tfrac15\bigr)^\top.
+\begin{aligned}
+a&=\rho\,s^\top q^{(1)}=\tfrac12, &
+q^{(0)}&=q^{(1)}-a\,y=\bigl(0,\tfrac12\bigr)^\top, &
+r^{(0)}&=\gamma q^{(0)}=\bigl(0,\tfrac15\bigr)^\top,\\
+b&=\rho\,y^\top r^{(0)}=\tfrac1{10}, &
+r^{(1)}&=r^{(0)}+(a-b)s=\bigl(\tfrac25,\tfrac15\bigr)^\top.
+\end{aligned}
 \]
 Por otra parte, la actualización explícita~\eqref{eq:actualizacion-bfgs} aplicada a $\gamma I$, con $V=I-\rho\,y s^\top=\begin{pmatrix}0&0\\-\frac12&1\end{pmatrix}$, da
 \[
 H=V^\top(\gamma I)V+\rho\,ss^\top=\begin{pmatrix}\frac35&-\frac15\\[2pt]-\frac15&\frac25\end{pmatrix},
-\qquad Hg=\bigl(\tfrac25,\tfrac15\bigr)^\top=r.
+\qquad Hg=\bigl(\tfrac25,\tfrac15\bigr)^\top=r^{(1)}.
 \]
 La recursión obtiene $Hg$ sin formar la matriz $H$.
 \end{ejemplo}
@@ -3315,7 +3031,7 @@ $\nabla F_\lambda$ es $L$-Lipschitz en $\mathcal{N}$, con
 $L=\max_{\theta\in\overline{\mathcal{N}}}\|\nabla^2F_\lambda(\theta)\|_2$. Para
 $\lambda=0$ este argumento no se aplica, pues $\mathcal{S}$ puede no ser acotado,
 y la hipótesis~3 del Teorema~\ref{thm:zoutendijk} queda sin verificar. En cambio, si una capa oculta usa $\operatorname{ReLU}$
-(como en el ejemplo del Capítulo~2 y en el prototipo inicial), $F$ deja de ser
+(como en el prototipo inicial), $F$ deja de ser
 diferenciable en los hiperplanos donde alguna preactivación se anula.
 \item \textbf{Acotación uniforme del número de condición:} en problemas no
 convexos no existe una garantía \emph{a priori} de que $\kappa_2(B_k)\le\Delta$
@@ -3350,7 +3066,7 @@ F_{\omega,\lambda}(\theta)
 \bigl[\omega_1 y_i\log p_i(\theta)+\omega_0(1-y_i)\log(1-p_i(\theta))\bigr]
 +\frac{\lambda}{2}\|\theta\|_2^2,
 \end{equation}
-con pesos de clase $\omega_1,\omega_0>0$ y $\lambda\ge 0$ (para $\omega_1=\omega_0=1$ se recupera $F_\lambda$ de la Observación~\ref{obs:hipotesis-gcnn-lbfgs}, y para $\lambda=0$, la pérdida $F$ de la Sección~\ref{sec:funcion-perdida}). Entonces:
+con pesos de clase $\omega_1,\omega_0>0$ y $\lambda\ge 0$ (para $\omega_1=\omega_0=1$ se recupera $F_\lambda$ de la Observación~\ref{obs:hipotesis-gcnn-lbfgs}, y para $\lambda=0$, la pérdida $F$ de la Sección~\ref{sec:funcion-perdida}; además, poniendo $\omega_{\min}:=\min\{\omega_1,\omega_0\}>0$ y $\omega_{\max}:=\max\{\omega_1,\omega_0\}$, se tiene $\omega_{\min}F(\theta)\le F_{\omega,0}(\theta)\le\omega_{\max}F(\theta)$ para todo $\theta\in\mathbb{R}^p$, por lo que $F_{\omega,0}$ conserva exactamente la caracterización $F_{\omega,0}(\theta_r)\to 0\iff p_i(\theta_r)\to y_i$ para todo $i\in I_{\mathrm{tr}}$ de la Proposición~\ref{prop:caracterizacion-perdida-empirica}). Entonces:
 \begin{enumerate}
 \item \textbf{Convergencia al único minimizador global para $L_{\mathrm{net}}=1$:} si $L_{\mathrm{net}}=1$ y $K_1\in\mathbb{N}_0$, sea $\widetilde{X}:=[X,SX,\ldots,S^{K_1}X]\in\mathbb{R}^{n\times p}$ ($p=(K_1+1)d_0$) y sea $\widetilde{X}_{I_{\mathrm{tr}}}\in\mathbb{R}^{m\times p}$ la submatriz de entrenamiento. Para todo $\theta\in\mathbb{R}^p$ se cumple
 \[
@@ -3451,7 +3167,7 @@ finitas centrales ($\varepsilon=10^{-6}$), obteniendo errores relativos máximos
 de $1{,}71\times 10^{-10}$ ($\tanh$) y $1{,}08\times 10^{-10}$ ($\operatorname{ReLU}$).
 
 \paragraph{Criterios de parada y configuraciones evaluadas.}
-Para abarcar de forma unificada la pérdida empírica de la Sección~\ref{sec:funcion-perdida}, la corrección del desbalance de clases y la regularización cuadrática discutidas en la Observación~\ref{obs:hipotesis-gcnn-lbfgs} y la Proposición~\ref{prop:convexidad-una-capa-vs-simetria}, las corridas minimizan la función objetivo $F_{\omega,\lambda}(\theta)$ definida en~\eqref{eq:objetivo-ponderado-l2}, donde $\omega_1,\omega_0>0$ son los pesos de clase (denotados con $\omega$ para distinguirlos de los parámetros $c_1,c_2$ de Wolfe) y el término $\frac{\lambda}{2}\|\theta\|_2^2$ penaliza todas las coordenadas de $\theta\in\mathbb{R}^p$, incluidos los sesgos; para $\omega_1=\omega_0=1$ y $\lambda=0$ se recupera $F_{1,0}=F$.
+Para abarcar de forma unificada la pérdida empírica original $F$ de la Sección~\ref{sec:funcion-perdida}, la corrección del desbalance de clases en Elliptic ($11{,}58\%$ ilícitos frente a $88{,}42\%$ lícitos) y la regularización cuadrática discutidas en la Observación~\ref{obs:hipotesis-gcnn-lbfgs} y la Proposición~\ref{prop:convexidad-una-capa-vs-simetria}, las corridas minimizan la familia $F_{\omega,\lambda}(\theta)$ definida en~\eqref{eq:objetivo-ponderado-l2}, donde $\omega_1,\omega_0>0$ son los pesos de clase (que preservan la equivalencia asintótica $\omega_{\min}F\le F_{\omega,0}\le\omega_{\max}F$ de la Proposición~\ref{prop:caracterizacion-perdida-empirica}, denotados con $\omega$ para distinguirlos de $c_1,c_2$ de Wolfe) y $\frac{\lambda}{2}\|\theta\|_2^2$ penaliza todas las coordenadas de $\theta\in\mathbb{R}^p$, incluidos los sesgos (compactificando $\mathcal{S}$ para cerrar la hipótesis~3 del Teorema~\ref{thm:zoutendijk} y frenando el sobreajuste temporal); para $\omega_1=\omega_0=1$ y $\lambda=0$ se recupera exactamente $F_{1,0}=F$ (evaluada como línea base en la primera fila de los Cuadros~\ref{tab:lbfgs-elliptic-opt} y~\ref{tab:lbfgs-elliptic-metricas}).
 Atendiendo a la exigencia de no detener el algoritmo únicamente por conteo de
 iteraciones, se impuso parada cuando $\|\nabla F_{\omega,\lambda}(\theta_k)\|_2\le 10^{-4}$ o
 cuando el cambio relativo
