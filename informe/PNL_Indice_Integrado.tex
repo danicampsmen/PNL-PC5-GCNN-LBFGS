@@ -801,7 +801,8 @@ d_G(v_i,v_j)=
 \text{ entre }v_i\text{ y }v_j\}.
 \]
 
-Si no existe un camino entre ambos vértices, se establece \(d_G(v_i,v_j)=+\infty\). Como el grafo es no dirigido, todo camino puede recorrerse en sentido inverso y, por tanto, \(d_G(v_i,v_j)=d_G(v_j,v_i)\), incluso cuando ambas distancias son infinitas. Asimismo, por concatenación de caminos (y con la convención \(a+(+\infty)=+\infty\) en \(\mathbb N_0\cup\{+\infty\}\)), se cumple la desigualdad triangular \(d_G(v_i,v_j)\le d_G(v_i,v_r)+d_G(v_r,v_j)\) para cualesquiera \(v_i,v_r,v_j\in V\). La matriz de distancias es simétrica, aunque sus entradas no tienen por qué ser iguales. En particular,
+Si no existe un camino entre ambos vértices, se establece \(d_G(v_i,v_j)=+\infty\). Como el grafo es no dirigido, todo camino puede recorrerse en sentido inverso y, por tanto, \(d_G(v_i,v_j)=d_G(v_j,v_i)\), incluso cuando ambas distancias son infinitas. Asimismo, por concatenación de caminos (y con la convención \(a+(+\infty)=+\infty\) en \(\mathbb N_0\cup\{+\infty\}\)), se cumple la desigualdad triangular \(d_G(v_i,v_j)\le d_G(v_i,v_r)+d_G(v_r,v_j)\) para cualesquiera \(v_i,v_r,v_j\in V\). La matriz de distancias es simétrica y sus entradas pueden valer \(+\infty\). En particular,
+% Corrección editorial (IA, 2026-11-25): se suprime «aunque sus entradas no tienen por qué ser iguales». review_pending.
 
 \[
 d_G(v_i,v_i)=0.
@@ -1275,7 +1276,8 @@ Para el filtro \(\mathcal H(S_3;h)=\frac25I_3+\frac35S_3\), la respuesta es \(h(
 \widetilde y=h(\Lambda)\widetilde x=(\sqrt3,\tfrac{2\sqrt2}{5},0)^\top,
 \qquad y=U\widetilde y=(\tfrac75,\tfrac35,1)^\top.
 \]
-Este cálculo usa la misma componente y el mismo operador que el ejemplo general, y muestra que el filtro escala cada componente espectral por \(h(\lambda_i)\).
+Este cálculo usa la componente \(\{v_7,v_8,v_9\}\) y el bloque \(S_3\) del Ejemplo~\ref{ej:operador-normalizado}, con un filtro de primer orden elegido para este ejemplo, e ilustra la Proposición~\ref{prop:espectro-fir}: el filtro escala cada componente espectral por \(h(\lambda_i)\).
+% Corrección editorial (IA, 2026-11-25): el filtro no es el de los ejemplos anteriores. review_pending.
 \end{ejemplo}
 
 \chapter{Arquitectura de la red neuronal convolucional sobre grafos}
@@ -1579,7 +1581,7 @@ que representa la probabilidad condicional verdadera de fraude, dadas las caract
 En consecuencia, $\mathbb P(Y_i=0\mid X=x,S=s)=1-\eta_i(x,s)$. Dado que la función $\eta_i$ es desconocida, consideramos una red neuronal convolucional sobre grafos $\Phi(\cdot;S,\theta)$ con capa de salida para clasificación binaria (Definición~\ref{def:gcnn-salida}), cuya salida correspondiente al vértice $v_i$ está dada por
 
 \[
-p_i(\theta;x,s):=
+\hat y_i(\theta;x,s):=
 [\Phi(x;s,\theta)]_{i1}\in(0,1).
 \]
 
@@ -1587,25 +1589,25 @@ El objetivo del modelo es determinar parámetros $\theta$ tales que
 
 \[
 \boxed{
-p_i(\theta;x,s)\approx\eta_i(x,s).
+\hat y_i(\theta;x,s)\approx\eta_i(x,s).
 }
 \]
 
-De este modo, interpretamos $p_i(\theta;x,s)$ como la probabilidad condicional de fraude estimada por la GCNN, mientras que $1-p_i(\theta;x,s)$ representa la probabilidad estimada de que la transacción sea legítima.
+De este modo, interpretamos $\hat y_i(\theta;x,s)$ como la probabilidad condicional de fraude estimada por la GCNN, mientras que $1-\hat y_i(\theta;x,s)$ representa la probabilidad estimada de que la transacción sea legítima.
 
 Finalmente, dado que durante el entrenamiento se consideran fijas las matrices observadas $x_{\mathrm{obs}}$ y $s_{\mathrm{obs}}$, \textbf{en adelante denotaremos simplemente por}
 
 \[
 \boxed{
-p_i(\theta):=
-p_i(\theta;x_{\mathrm{obs}},s_{\mathrm{obs}}).
+\hat y_i(\theta):=
+\hat y_i(\theta;x_{\mathrm{obs}},s_{\mathrm{obs}}).
 }
 \]
 
 En consecuencia, identificando $X=x_{\mathrm{obs}}$ y $S=s_{\mathrm{obs}}$ en el conjunto de datos observado, la salida de la GCNN queda expresada por
 
 \[
-p(\theta):=\Phi(X;S,\theta)
+\hat y(\theta):=\Phi(X;S,\theta)
 =
 \begin{pmatrix}
 p_1(\theta)\\
@@ -1654,7 +1656,7 @@ Considerando las matrices $X$ y $S$ fijadas, los datos de entrenamiento quedan r
 }
 \]
 
-Dado que las probabilidades condicionales verdaderas $\eta_i$ son desconocidas, el ajuste de los parámetros $\theta$ se realizará a partir de las predicciones $p_i(\theta)$ y las etiquetas observadas $y_i$, para $i\in I_{\mathrm{tr}}$.
+Dado que las probabilidades condicionales verdaderas $\eta_i$ son desconocidas, el ajuste de los parámetros $\theta$ se realizará a partir de las predicciones $\hat y_i(\theta)$ y las etiquetas observadas $y_i$, para $i\in I_{\mathrm{tr}}$.
 
 \subsection{Pérdida individual}
 
@@ -1667,8 +1669,8 @@ $f_i:\mathbb{R}^p\to\mathbb{R}$ mediante
 \boxed{
 f_i(\theta)
 :=
--y_i\log p_i(\theta)
--(1-y_i)\log(1-p_i(\theta)).
+-y_i\log \hat y_i(\theta)
+-(1-y_i)\log(1-\hat y_i(\theta)).
 }
 \]
 
@@ -1683,7 +1685,7 @@ Para cada $i\in I_{\mathrm{tr}}$ y todo $\theta\in\mathbb{R}^p$, se cumple
 \[
 f_i(\theta)
 =
--\log\left(1-|p_i(\theta)-y_i|\right).
+-\log\left(1-|\hat y_i(\theta)-y_i|\right).
 \]
 
 En particular, $f_i(\theta)>0$. Además, para toda sucesión
@@ -1692,7 +1694,7 @@ $(\theta_r)_{r\in\mathbb{N}}\subseteq\mathbb{R}^p$,
 \[
 f_i(\theta_r)\longrightarrow 0
 \quad\Longleftrightarrow\quad
-p_i(\theta_r)\longrightarrow y_i.
+\hat y_i(\theta_r)\longrightarrow y_i.
 \]
 
 \end{proposicion}
@@ -1702,23 +1704,23 @@ p_i(\theta_r)\longrightarrow y_i.
 Fijemos $i\in I_{\mathrm{tr}}$.
 
 Si $y_i=1$, entonces $
-f_i(\theta)=-\log p_i(\theta).
-$ Como $0<p_i(\theta)<1$, se tiene $
-1-|p_i(\theta)-1|=p_i(\theta),
+f_i(\theta)=-\log \hat y_i(\theta).
+$ Como $0<\hat y_i(\theta)<1$, se tiene $
+1-|\hat y_i(\theta)-1|=\hat y_i(\theta),
 $ y por tanto, $
 f_i(\theta)
 =
--\log\left(1-|p_i(\theta)-y_i|\right).
+-\log\left(1-|\hat y_i(\theta)-y_i|\right).
 $ Si $y_i=0$, entonces $
-f_i(\theta)=-\log(1-p_i(\theta)).
-$ Dado que $|p_i(\theta)|=p_i(\theta)$, se obtiene la misma identidad. Además, $
-0<1-|p_i(\theta)-y_i|<1,
+f_i(\theta)=-\log(1-\hat y_i(\theta)).
+$ Dado que $|\hat y_i(\theta)|=\hat y_i(\theta)$, se obtiene la misma identidad. Además, $
+0<1-|\hat y_i(\theta)-y_i|<1,
 $ de donde $f_i(\theta)>0$.
 
 Para probar la equivalencia, la identidad anterior implica
 
 \[
-|p_i(\theta_r)-y_i|
+|\hat y_i(\theta_r)-y_i|
 =
 1-e^{-f_i(\theta_r)}.
 \]
@@ -1726,11 +1728,11 @@ Para probar la equivalencia, la identidad anterior implica
 Si $f_i(\theta_r)\to 0$, por continuidad de la función exponencial,
 
 \[
-|p_i(\theta_r)-y_i|\longrightarrow 0 \quad \text{por consiguiente} \quad p_i(\theta_r)\longrightarrow y_i.
+|\hat y_i(\theta_r)-y_i|\longrightarrow 0 \quad \text{por consiguiente} \quad \hat y_i(\theta_r)\longrightarrow y_i.
 \]
 
-Recíprocamente, si $p_i(\theta_r)\to y_i$, entonces $
-1-|p_i(\theta_r)-y_i|\longrightarrow 1.
+Recíprocamente, si $\hat y_i(\theta_r)\to y_i$, entonces $
+1-|\hat y_i(\theta_r)-y_i|\longrightarrow 1.
 $
 
 Por continuidad del logaritmo en $1$,
@@ -1738,7 +1740,7 @@ Por continuidad del logaritmo en $1$,
 \[
 f_i(\theta_r)
 =
--\log\left(1-|p_i(\theta_r)-y_i|\right)
+-\log\left(1-|\hat y_i(\theta_r)-y_i|\right)
 \longrightarrow 0.\qedhere
 \]
 \end{proof}
@@ -1760,7 +1762,7 @@ Por la Proposición~\ref{prop:caracterizacion-perdida-individual}, equivalenteme
 \boxed{
 F(\theta)
 =-\frac{1}{m}\sum_{i\in I_{\mathrm{tr}}}
-\log\left(1-|p_i(\theta)-y_i|\right).
+\log\left(1-|\hat y_i(\theta)-y_i|\right).
 }
 \]
 
@@ -1778,7 +1780,7 @@ se cumple
 \boxed{
 \lim_{r\to\infty}F(\theta_r)=0
 \quad\Longleftrightarrow\quad
-\lim_{r\to\infty}p_i(\theta_r)=y_i,
+\lim_{r\to\infty}\hat y_i(\theta_r)=y_i,
 \quad \forall i\in I_{\mathrm{tr}}.
 }
 \]
@@ -1814,14 +1816,14 @@ $F(\theta_r)\to 0$, por el teorema del sándwich,
 Aplicando nuevamente la Proposición~\ref{prop:caracterizacion-perdida-individual}, resulta
 
 \[
-\lim_{r\to\infty}p_i(\theta_r)=y_i,
+\lim_{r\to\infty}\hat y_i(\theta_r)=y_i,
 \qquad \forall i\in I_{\mathrm{tr}}.
 \]
 
 Recíprocamente, supongamos que
 
 \[
-\lim_{r\to\infty}p_i(\theta_r)=y_i,
+\lim_{r\to\infty}\hat y_i(\theta_r)=y_i,
 \qquad \forall i\in I_{\mathrm{tr}}.
 \]
 
@@ -1852,10 +1854,14 @@ El entrenamiento de la GCNN se plantea como el siguiente problema de optimizaci�
 
 \[
 \boxed{
-\min_{\theta\in\mathbb{R}^p}F(\theta),
+\inf_{\theta\in\mathbb{R}^p}F(\theta),
 }
 \]
-donde $F$ es la función de pérdida empírica definida en la Sección~\ref{sec:funcion-perdida}.
+donde $F$ es la función de pérdida empírica definida en la Sección~\ref{sec:funcion-perdida}. En lo que sigue se supone que cada activación $\sigma_\ell$ es de clase $C^1$, de modo que $F$ es diferenciable, como exigen los métodos de este capítulo; $\operatorname{ReLU}$ no cumple esta hipótesis (Observación~\ref{obs:hipotesis-gcnn-lbfgs}).
+
+Como $F(\theta)>0$ para todo $\theta$ (Proposición~\ref{prop:caracterizacion-perdida-individual}), el ínfimo es finito; pero si vale $0$, no se alcanza, y en general no está garantizada la existencia de un minimizador. Por ello, los métodos de este capítulo buscan puntos estacionarios de $F$. Si se añade el término $\frac\lambda2\|\theta\|_2^2$ con $\lambda>0$, la función resultante es continua y tiende a $+\infty$ cuando $\|\theta\|_2\to\infty$; sus conjuntos de nivel son compactos y, por el teorema de Weierstrass, alcanza su mínimo.
+% Corrección editorial (IA, 2026-11-25): original «\min_{\theta}F(\theta)» sin probar
+% la existencia del mínimo; se añade la hipótesis sigma_ell en C^1. review_pending.
 
 \section{Método de optimización L-BFGS}
 
@@ -2097,6 +2103,8 @@ Elegimos un tamaño de paso \(\alpha_k>0\) (por ejemplo, mediante condiciones de
 F(\theta_k+\alpha_kd_k)<F(\theta_k) \quad \text{y} \quad \nabla F(\theta_k+\alpha_kd_k)^\top d_k
 >g_k^\top d_k.
 \]
+Si $F$ es de clase $C^1$, está acotada inferiormente y $g_k^\top d_k<0$, tal $\alpha_k$ existe: cualquier paso que cumpla las condiciones de Wolfe sirve (Lema~\ref{lem:existencia-wolfe}). Con $F$ solo diferenciable puede no existir; por ejemplo, si $F$ es afín no constante, $\nabla F(\theta_k+\alpha d_k)^\top d_k=g_k^\top d_k$ para todo $\alpha$.
+% Corrección editorial (IA, 2026-11-25), revisión de coherencia: review_pending.
 
 Una vez elegido \(\alpha_k\), calculamos el siguiente iterado:
 \[
@@ -2202,13 +2210,15 @@ donde
     \label{eq:lbfgs-escalado}
     \gamma_k=
     \begin{cases}
-        1, & k=0,\\[8pt]
+        \gamma_0, & k=0,\\[8pt]
         \displaystyle
         \frac{s_{k-1}^\top y_{k-1}}
         {y_{k-1}^\top y_{k-1}}, & k\geq 1
     \end{cases}
 \end{equation}
-(o bien un escalar fijo $\gamma_0>0$ en $k=0$, en cuyo caso $H_0=\gamma_0 I_p$).
+donde $\gamma_0>0$ es un escalar fijado (por ejemplo, $\gamma_0=1$).
+% Corrección editorial (IA, 2026-11-25): se unifica gamma_0>0 general y d_0=-gamma_0 g_0;
+% original: caso k=0 con valor 1 «(o bien un escalar fijo gamma_0>0 ...)». review_pending.
 
 Siguiendo la formulación de Mannel~\cite[sección~2.1, ec.~(1)]{mannel2025}, definimos recursivamente las matrices (con rango vacío para $k=0$)
 \begin{equation}
@@ -2229,9 +2239,9 @@ La matriz $H_k$ del método L-BFGS se define mediante
     \label{eq:matriz-lbfgs}
 \end{equation}
 
-En particular, con $\gamma_0=1$ en~\eqref{eq:lbfgs-escalado}, para $k=0$ ($\ell_0=0$) se tiene
+En particular, para $k=0$ ($\ell_0=0$) se tiene
 \[
-    H_0=H_0^{(0)}=I_p.
+    H_0=H_0^{(0)}=\gamma_0 I_p.
 \]
 
 El método L-BFGS genera una sucesión de puntos mediante
@@ -2403,7 +2413,7 @@ Entonces:
 
 Para $k=0$, se tiene
 \[
-    H_0=I_p,
+    H_0=\gamma_0 I_p,\qquad \gamma_0>0,
 \]
 por lo que $H_0$ es simétrica definida positiva.
 
@@ -2474,9 +2484,9 @@ Si $g_0=0$, detenemos el algoritmo.
 
 \noindent\textbf{Primera iteración ($k=0$).}
 
-Como $H_0=I_p$, calculamos directamente la dirección
+Como $H_0=\gamma_0I_p$, calculamos directamente la dirección
 \[
-    d_0=-g_0.
+    d_0=-\gamma_0g_0.
 \]
 
 Elegimos un tamaño de paso $\alpha_0>0$ (por ejemplo, mediante condiciones de Wolfe; véase la Definición~\ref{def:lbfgs-wolfe}) tal que
@@ -2488,6 +2498,8 @@ y
     \nabla F(\theta_0+\alpha_0 d_0)^\top d_0
     >g_0^\top d_0.
 \]
+Si $F$ es de clase $C^1$, está acotada inferiormente y $g_0^\top d_0<0$, tal $\alpha_0$ existe: cualquier paso que cumpla las condiciones de Wolfe sirve (Lema~\ref{lem:existencia-wolfe}). Con $F$ solo diferenciable puede no existir; por ejemplo, si $F$ es afín no constante, $\nabla F(\theta_0+\alpha d_0)^\top d_0=g_0^\top d_0$ para todo $\alpha$.
+% Corrección editorial (IA, 2026-11-25), revisión de coherencia: review_pending.
 
 Calculamos el siguiente iterado
 \[
@@ -2613,6 +2625,8 @@ y
     \nabla F(\theta_k+\alpha_k d_k)^\top d_k
     >g_k^\top d_k.
 \]
+Si $F$ es de clase $C^1$, está acotada inferiormente y $g_k^\top d_k<0$, tal $\alpha_k$ existe: cualquier paso que cumpla las condiciones de Wolfe sirve (Lema~\ref{lem:existencia-wolfe}). Con $F$ solo diferenciable puede no existir; por ejemplo, si $F$ es afín no constante, $\nabla F(\theta_k+\alpha d_k)^\top d_k=g_k^\top d_k$ para todo $\alpha$.
+% Corrección editorial (IA, 2026-11-25), revisión de coherencia: review_pending.
 
 Una vez elegido $\alpha_k$, calculamos
 \[
@@ -2682,6 +2696,196 @@ son simétricas definidas positivas y las direcciones
 generadas son de descenso mientras $g_k\neq 0$.
 
 \end{observacion}
+
+
+% Procedencia: ejemplo y figura Memoria_LBFGS_M3.png aportados desde Overleaf (zip del 2026-11-25); cálculos
+% reverificados con la recursión de dos lazos (IA, 2026-11-25). Se toma gamma_0=1. review_pending.
+\begin{ejemplo}[Aplicación del método L-BFGS con memoria $M=3$]\label{ej:lbfgs-memoria-tres}
+Consideremos el problema
+\[
+    \min_{\theta\in\mathbb{R}^2}F(\theta),\qquad
+    F(\theta)=\tfrac12(\theta_1^2+4\theta_2^2),\qquad
+    \nabla F(\theta)=(\theta_1,4\theta_2)^\top.
+\]
+Para aplicar el Algoritmo~\ref{alg:lbfgs}, elegimos $\theta_0=(1,1)^\top$ y $M=3$.
+Realizaremos seis iteraciones del método. Los resultados numéricos se presentan redondeados a seis decimales.
+
+\smallskip
+\noindent\textbf{Iteración $k=0$.} Como $g_0=(1,4)^\top\ne0$, con $\gamma_0=1$ calculamos $d_0=-\gamma_0g_0=-g_0=(-1,-4)^\top$. Elegimos $\alpha_0=1/8$, obteniendo
+\[
+    \theta_1=\theta_0+\alpha_0d_0=(0.875,0.5)^\top,\qquad g_1=(0.875,2)^\top.
+\]
+Se verifican las desigualdades del algoritmo:
+\[
+\begin{aligned}
+    F(\theta_1)&\approx0.882813<2.5=F(\theta_0),\\
+    g_1^\top d_0&=-8.875>-17=g_0^\top d_0.
+\end{aligned}
+\]
+Como $g_1\ne0$, calculamos
+\[
+    s_0=\theta_1-\theta_0=(-0.125,-0.5)^\top,\qquad
+    y_0=g_1-g_0=(-0.125,-2)^\top.
+\]
+Se tiene $y_0^\top s_0=1.015625>0$. Por tanto,
+\[
+    \rho_0=\frac{1}{y_0^\top s_0}\approx0.984615,\qquad
+    \gamma_1=\frac{s_0^\top y_0}{y_0^\top y_0}\approx0.252918.
+\]
+Almacenamos $(s_0,y_0)$ y $\rho_0$, y tomamos $k\leftarrow1$.
+
+\smallskip
+\noindent\textbf{Iteración $k=1$.} Como $\ell_1=\min(1,3)=1$, trabajamos únicamente con el par $(s_0,y_0)$.
+
+\noindent\textbf{Paso 1.} Primer bucle. Tomamos $q^{(1)}=g_1$. Recorriendo $j=0$, con $i=j$, obtenemos
+\[
+\begin{aligned}
+    a_0&=\rho_0s_0^\top q^{(1)}\approx -1.092308, & q^{(0)}&=q^{(1)}-a_0y_0\approx (0.738462,-0.184615)^\top.
+\end{aligned}
+\]
+\noindent\textbf{Paso 2.} Calculamos $r^{(0)}=\gamma_1q^{(0)}\approx (0.186770,-0.046693)^\top$.
+
+\noindent\textbf{Paso 3.} Segundo bucle. Recorriendo $j=0$, con $i=j$, obtenemos
+\[
+\begin{aligned}
+    b_0&=\rho_0y_0^\top r^{(0)}\approx 0.068961, & r^{(1)}&=r^{(0)}+s_0(a_0-b_0)\approx (0.331929,0.533942)^\top.
+\end{aligned}
+\]
+\noindent\textbf{Paso 4.} Tomamos $d_1=-r^{(1)}$ y elegimos $\alpha_1=0.5$, obteniendo
+\[
+\begin{aligned}
+    \theta_2&=\theta_1+\alpha_1d_1\approx (0.709035,0.233029)^\top,\\
+    g_2&\approx (0.709035,0.932116)^\top.
+\end{aligned}
+\]
+Se verifican las desigualdades
+\[
+\begin{aligned}
+    F(\theta_2)&\approx 0.359971<0.882813\approx F(\theta_1),\\
+    g_2^\top d_1&\approx -0.733045>-1.358322\approx g_1^\top d_1.
+\end{aligned}
+\]
+\noindent\textbf{Paso 5.} Como $g_2\ne0$, calculamos
+\[
+\begin{aligned}
+    s_1&=\theta_2-\theta_1\approx (-0.165965,-0.266971)^\top,\\
+    y_1&=g_2-g_1\approx (-0.165965,-1.067884)^\top.
+\end{aligned}
+\]
+Se tiene
+\[
+    y_1^\top s_1\approx 0.312638>0,\qquad
+    \rho_1=\frac{1}{y_1^\top s_1}\approx 3.198585.
+\]
+Dado que $k=1<M=3$, almacenamos $(s_1,y_1)$ y $\rho_1$ sin eliminar ningún par.
+
+\noindent\textbf{Paso 6.} Calculamos $\gamma_2=\frac{s_1^\top y_1}{y_1^\top y_1}\approx 0.267688$ y tomamos $k\leftarrow2$.
+
+\smallskip
+\noindent\textbf{Iteración $k=2$.} Como $\ell_2=\min(2,3)=2$, trabajamos con los pares $(s_0,y_0),\ (s_1,y_1)$.
+
+\noindent\textbf{Paso 1.} Primer bucle. Tomamos $q^{(2)}=g_2$. Recorriendo $j=1,0$, con $i=j$, obtenemos
+\[
+\begin{aligned}
+    a_1&=\rho_1s_1^\top q^{(2)}\approx -1.172354, & q^{(1)}&=q^{(2)}-a_1y_1\approx (0.514466,-0.319822)^\top\\
+    a_0&=\rho_0s_0^\top q^{(1)}\approx 0.094132, & q^{(0)}&=q^{(1)}-a_0y_0\approx (0.526233,-0.131558)^\top.
+\end{aligned}
+\]
+\noindent\textbf{Paso 2.} Calculamos $r^{(0)}=\gamma_2q^{(0)}\approx (0.140866,-0.035217)^\top$.
+
+\noindent\textbf{Paso 3.} Segundo bucle. Recorriendo $j=0,1$, con $i=j$, obtenemos
+\[
+\begin{aligned}
+    b_0&=\rho_0y_0^\top r^{(0)}\approx 0.052012, & r^{(1)}&=r^{(0)}+s_0(a_0-b_0)\approx (0.135601,-0.056276)^\top\\
+    b_1&=\rho_1y_1^\top r^{(1)}\approx 0.120240, & r^{(2)}&=r^{(1)}+s_1(a_1-b_1)\approx (0.350126,0.288809)^\top.
+\end{aligned}
+\]
+\noindent\textbf{Paso 4.} Tomamos $d_2=-r^{(2)}$ y elegimos $\alpha_2=0.5$, obteniendo
+\[
+\begin{aligned}
+    \theta_3&=\theta_2+\alpha_2d_2\approx (0.533972,0.088625)^\top,\\
+    g_3&\approx (0.533972,0.354499)^\top.
+\end{aligned}
+\]
+Se verifican las desigualdades
+\[
+\begin{aligned}
+    F(\theta_3)&\approx 0.158272<0.359971\approx F(\theta_2),\\
+    g_3^\top d_2&\approx -0.289340>-0.517455\approx g_2^\top d_2.
+\end{aligned}
+\]
+\noindent\textbf{Paso 5.} Como $g_3\ne0$, calculamos
+\[
+\begin{aligned}
+    s_2&=\theta_3-\theta_2\approx (-0.175063,-0.144404)^\top,\\
+    y_2&=g_3-g_2\approx (-0.175063,-0.577617)^\top.
+\end{aligned}
+\]
+Se tiene
+\[
+    y_2^\top s_2\approx 0.114058>0,\qquad
+    \rho_2=\frac{1}{y_2^\top s_2}\approx 8.767505.
+\]
+Dado que $k=2<M=3$, almacenamos $(s_2,y_2)$ y $\rho_2$ sin eliminar ningún par.
+
+\noindent\textbf{Paso 6.} Calculamos $\gamma_3=\frac{s_2^\top y_2}{y_2^\top y_2}\approx 0.313096$ y tomamos $k\leftarrow3$.
+
+\smallskip
+\noindent\textbf{Iteración $k=3$.} Como $\ell_3=\min(3,3)=3$, trabajamos con los pares $(s_0,y_0),\ (s_1,y_1),\ (s_2,y_2)$.
+
+\noindent\textbf{Paso 1.} Primer bucle. Tomamos $q^{(3)}=g_3$. Recorriendo $j=2,1,0$, con $i=j$, obtenemos
+\[
+\begin{aligned}
+    a_2&=\rho_2s_2^\top q^{(3)}\approx -1.268395, & q^{(2)}&=q^{(3)}-a_2y_2\approx (0.311923,-0.378148)^\top\\
+    a_1&=\rho_1s_1^\top q^{(2)}\approx 0.157327, & q^{(1)}&=q^{(2)}-a_1y_1\approx (0.338034,-0.210141)^\top\\
+    a_0&=\rho_0s_0^\top q^{(1)}\approx 0.061850, & q^{(0)}&=q^{(1)}-a_0y_0\approx (0.345765,-0.086441)^\top.
+\end{aligned}
+\]
+\noindent\textbf{Paso 2.} Calculamos $r^{(0)}=\gamma_3q^{(0)}\approx (0.108258,-0.027064)^\top$.
+
+\noindent\textbf{Paso 3.} Segundo bucle. Recorriendo $j=0,1,2$, con $i=j$, obtenemos
+\[
+\begin{aligned}
+    b_0&=\rho_0y_0^\top r^{(0)}\approx 0.039972, & r^{(1)}&=r^{(0)}+s_0(a_0-b_0)\approx (0.105523,-0.038003)^\top\\
+    b_1&=\rho_1y_1^\top r^{(1)}\approx 0.073792, & r^{(2)}&=r^{(1)}+s_1(a_1-b_1)\approx (0.091659,-0.060305)^\top\\
+    b_2&=\rho_2y_2^\top r^{(2)}\approx 0.164715, & r^{(3)}&=r^{(2)}+s_2(a_2-b_2)\approx (0.342544,0.146642)^\top.
+\end{aligned}
+\]
+\noindent\textbf{Paso 4.} Tomamos $d_3=-r^{(3)}$ y elegimos $\alpha_3=0.5$, obteniendo
+\[
+\begin{aligned}
+    \theta_4&=\theta_3+\alpha_3d_3\approx (0.362701,0.015303)^\top,\\
+    g_4&\approx (0.362701,0.061214)^\top.
+\end{aligned}
+\]
+Se verifican las desigualdades
+\[
+\begin{aligned}
+    F(\theta_4)&\approx 0.066244<0.158272\approx F(\theta_3),\\
+    g_4^\top d_3&\approx -0.133217>-0.234893\approx g_3^\top d_3.
+\end{aligned}
+\]
+\noindent\textbf{Paso 5.} Como $g_4\ne0$, calculamos
+\[
+\begin{aligned}
+    s_3&=\theta_4-\theta_3\approx (-0.171272,-0.073321)^\top,\\
+    y_3&=g_4-g_3\approx (-0.171272,-0.293285)^\top.
+\end{aligned}
+\]
+Se tiene
+\[
+    y_3^\top s_3\approx 0.050838>0,\qquad
+    \rho_3=\frac{1}{y_3^\top s_3}\approx 19.670299.
+\]
+En este caso, $k=3\geq M=3$. Por tanto, eliminamos el par más antiguo, de índice $k-M=0$, es decir, $(s_0,y_0)$ y su correspondiente valor $\rho_0$. Almacenamos el nuevo par $(s_3,y_3)$ y $\rho_3$.
+
+\noindent\textbf{Paso 6.} Calculamos $\gamma_4=\frac{s_3^\top y_3}{y_3^\top y_3}\approx 0.440728$ y tomamos $k\leftarrow4$.
+
+En la siguiente iteración, dado que $\ell_4=\min(4,3)=3$, trabajaremos con los pares $(s_1,y_1)$, $(s_2,y_2)$ y $(s_3,y_3)$. Continuando de manera análoga con $\alpha_4=\alpha_5=0.5$ y denotando por $P_i$ al par $(s_i,y_i)$ junto con su correspondiente valor $\rho_i$, el comportamiento de la memoria durante las seis iteraciones se representa de la siguiente manera:
+\begin{center}
+    \includegraphics[width=\linewidth]{Memoria_LBFGS_M3.png}
+\end{center}
+\end{ejemplo}
 
 
 % Procedencia: ejemplo construido (IA, Claude, 2026-11-23); números verificados
@@ -2930,8 +3134,7 @@ $s_k:=\theta_{k+1}-\theta_k$ e $y_k:=g_{k+1}-g_k$. Si $d_k$ es dirección de des
 entonces la condición de curvatura~\eqref{eq:wolfe-curvatura} garantiza
 automáticamente $s_k^\top y_k>0$. En consecuencia, partiendo de
 $H_k^{(0)}=\gamma_k I_p\succ 0$ con $\gamma_k=(s_{k-1}^\top y_{k-1})/\|y_{k-1}\|_2^2>0$
-para $k\ge 1$ y un $\gamma_0>0$ fijado ($\gamma_0=1$ en la Definición~\ref{def:metodo-lbfgs},
-o $\gamma_0=1/\max\{1,\|g_0\|_2\}$ en la implementación), las Proposiciones~\ref{prop:actualizacion-bfgs}
+para $k\ge 1$ y un $\gamma_0>0$ fijado (por ejemplo, $\gamma_0=1$, o $\gamma_0=1/\max\{1,\|g_0\|_2\}$ en la implementación), las Proposiciones~\ref{prop:actualizacion-bfgs}
 y~\ref{prop:propiedades-lbfgs} aseguran que el operador implícito $H_k$ del
 algoritmo L-BFGS con memoria $M$ es simétrico definido positivo y genera una
 dirección de descenso $d_k=-H_k g_k$ en cada iteración mientras $g_k\neq 0$.
@@ -3063,10 +3266,10 @@ Considérese la GCNN de la Definición~\ref{def:gcnn-red} con capa final sigmoid
 \begin{equation}\label{eq:objetivo-ponderado-l2}
 F_{\omega,\lambda}(\theta)
 := -\frac{1}{m}\sum_{i\in I_{\mathrm{tr}}}
-\bigl[\omega_1 y_i\log p_i(\theta)+\omega_0(1-y_i)\log(1-p_i(\theta))\bigr]
+\bigl[\omega_1 y_i\log \hat y_i(\theta)+\omega_0(1-y_i)\log(1-\hat y_i(\theta))\bigr]
 +\frac{\lambda}{2}\|\theta\|_2^2,
 \end{equation}
-con pesos de clase $\omega_1,\omega_0>0$ y $\lambda\ge 0$ (para $\omega_1=\omega_0=1$ se recupera $F_\lambda$ de la Observación~\ref{obs:hipotesis-gcnn-lbfgs}, y para $\lambda=0$, la pérdida $F$ de la Sección~\ref{sec:funcion-perdida}; además, poniendo $\omega_{\min}:=\min\{\omega_1,\omega_0\}>0$ y $\omega_{\max}:=\max\{\omega_1,\omega_0\}$, se tiene $\omega_{\min}F(\theta)\le F_{\omega,0}(\theta)\le\omega_{\max}F(\theta)$ para todo $\theta\in\mathbb{R}^p$, por lo que $F_{\omega,0}$ conserva exactamente la caracterización $F_{\omega,0}(\theta_r)\to 0\iff p_i(\theta_r)\to y_i$ para todo $i\in I_{\mathrm{tr}}$ de la Proposición~\ref{prop:caracterizacion-perdida-empirica}). Entonces:
+con pesos de clase $\omega_1,\omega_0>0$ y $\lambda\ge 0$ (para $\omega_1=\omega_0=1$ se recupera $F_\lambda$ de la Observación~\ref{obs:hipotesis-gcnn-lbfgs}, y para $\lambda=0$, la pérdida $F$ de la Sección~\ref{sec:funcion-perdida}; además, poniendo $\omega_{\min}:=\min\{\omega_1,\omega_0\}>0$ y $\omega_{\max}:=\max\{\omega_1,\omega_0\}$, se tiene $\omega_{\min}F(\theta)\le F_{\omega,0}(\theta)\le\omega_{\max}F(\theta)$ para todo $\theta\in\mathbb{R}^p$, por lo que $F_{\omega,0}$ conserva exactamente la caracterización $F_{\omega,0}(\theta_r)\to 0\iff \hat y_i(\theta_r)\to y_i$ para todo $i\in I_{\mathrm{tr}}$ de la Proposición~\ref{prop:caracterizacion-perdida-empirica}). Entonces:
 \begin{enumerate}
 \item \textbf{Convergencia al único minimizador global para $L_{\mathrm{net}}=1$:} si $L_{\mathrm{net}}=1$ y $K_1\in\mathbb{N}_0$, sea $\widetilde{X}:=[X,SX,\ldots,S^{K_1}X]\in\mathbb{R}^{n\times p}$ ($p=(K_1+1)d_0$) y sea $\widetilde{X}_{I_{\mathrm{tr}}}\in\mathbb{R}^{m\times p}$ la submatriz de entrenamiento. Para todo $\theta\in\mathbb{R}^p$ se cumple
 \[
@@ -3075,30 +3278,32 @@ con pesos de clase $\omega_1,\omega_0>0$ y $\lambda\ge 0$ (para $\omega_1=\omega
 L := \frac{\max\{\omega_1,\omega_0\}}{4m}\|\widetilde{X}_{I_{\mathrm{tr}}}\|_2^2 + \lambda.
 \]
 En particular, $\nabla F_{\omega,\lambda}$ es globalmente $L$-Lipschitz en $\mathbb{R}^p$. Si además $\lambda>0$, $F_{\omega,\lambda}$ es $\lambda$-fuertemente convexa, posee un único minimizador global $\theta^*\in\mathbb{R}^p$, el método L-BFGS (Algoritmo~\ref{alg:lbfgs}) con búsqueda lineal de Wolfe verifica automáticamente la cota uniforme~\eqref{eq:condicion-uniforme-lbfgs} sin salvaguardas y genera iterados que o bien alcanzan $\theta^*$ en un número finito de pasos (cuando $g_{k_0}=0$), o bien cumplen $\lim_{k\to\infty}\theta_k=\theta^*$.
-\item \textbf{Colapso por simetría de la envolvente convexa para $L_{\mathrm{net}}=2$:} si $L_{\mathrm{net}}=2$ y la activación oculta $\sigma_1$ es impar ($\sigma_1(-u)=-\sigma_1(u)$, como $\tanh$), entonces $F_{\omega,\lambda}(-\theta^{(1)},-\theta^{(2)})=F_{\omega,\lambda}(\theta^{(1)},\theta^{(2)})$ para todo $\theta=(\theta^{(1)},\theta^{(2)})\in\mathbb{R}^p$, donde $\theta^{(\ell)}$ reúne los pesos de la capa $\ell$. En consecuencia, la envolvente convexa $\operatorname{conv}(F_{\omega,\lambda})$ y la biconjugada de Fenchel $F_{\omega,\lambda}^{**}$ —y, en general, toda cota inferior convexa $\varphi\le F_{\omega,\lambda}$ tal que $\inf_{\mathbb{R}^p}\varphi=\inf_{\mathbb{R}^p} F_{\omega,\lambda}$— alcanzan su mínimo global en $\theta=0$, donde la red original predice $p_i(0)=\frac12$.
+\item \textbf{Colapso por simetría de la envolvente convexa para $L_{\mathrm{net}}=2$:} si $L_{\mathrm{net}}=2$, la red no tiene sesgos (como en la Definición~\ref{def:gcnn-red}) y la activación oculta $\sigma_1$ es impar ($\sigma_1(-u)=-\sigma_1(u)$, como $\tanh$), entonces $F_{\omega,\lambda}(-\theta^{(1)},-\theta^{(2)})=F_{\omega,\lambda}(\theta^{(1)},\theta^{(2)})$ para todo $\theta=(\theta^{(1)},\theta^{(2)})\in\mathbb{R}^p$, donde $\theta^{(\ell)}$ reúne los pesos de la capa $\ell$. En consecuencia, la envolvente convexa $\operatorname{conv}(F_{\omega,\lambda})$ y la biconjugada de Fenchel $F_{\omega,\lambda}^{**}$ —y, en general, toda cota inferior convexa $\varphi\le F_{\omega,\lambda}$ tal que $\inf_{\mathbb{R}^p}\varphi=\inf_{\mathbb{R}^p} F_{\omega,\lambda}$— alcanzan su mínimo global en $\theta=0$, donde la red original predice $\hat y_i(0)=\frac12$.
 \item \textbf{Suavización $C^\infty$ unilateral mediante $\operatorname{softplus}_\beta$:} para todo $\beta>0$, la función $\operatorname{softplus}_\beta(u):=\frac1\beta\log(1+e^{\beta u})$ pertenece a $C^\infty(\mathbb{R})$, satisface $0<\operatorname{softplus}_\beta'(u)=\sigma_{\mathrm{sig}}(\beta u)<1$, $0<\operatorname{softplus}_\beta''(u)\le\frac\beta4$ y aproxima uniformemente a $\operatorname{ReLU}(u)=\max\{0,u\}$ en todo $\mathbb{R}$ con error exacto
 \[
 \sup_{u\in\mathbb{R}}\bigl|\operatorname{softplus}_\beta(u)-\operatorname{ReLU}(u)\bigr|=\frac{\log 2}{\beta},
 \]
-garantizando las hipótesis~1--3 del Teorema~\ref{thm:zoutendijk} para $F_{\omega,\lambda}$ ($\lambda>0$) sin saturación en $(0,\infty)$.
+garantizando las hipótesis~1--3 del Teorema~\ref{thm:zoutendijk} para $F_{\omega,\lambda}$ ($\lambda>0$); además, a diferencia de $\tanh$, su derivada no se anula asintóticamente en $(0,\infty)$, pues $\operatorname{softplus}_\beta'(u)\to1$ cuando $u\to+\infty$.
+% Corrección editorial (IA, 2026-11-25): hipótesis «sin sesgos» explícita en la Parte 2 y
+% «sin saturación en (0,\infty)» precisado. review_pending.
 \end{enumerate}
 \end{proposicion}
 
 \begin{proof}
 \emph{Parte~1.} Para $L_{\mathrm{net}}=1$, las preactivaciones son $z(\theta)=\widetilde{X}\theta$, con filas $\tilde x_i^\top$ de $\widetilde{X}$. Definiendo $\omega_{(i)}:=\omega_1 y_i+\omega_0(1-y_i)>0$ para $y_i\in\{0,1\}$ y usando $\sigma_{\mathrm{sig}}'=\sigma_{\mathrm{sig}}(1-\sigma_{\mathrm{sig}})$, la derivación directa da
 \[
-\nabla F_{\omega,\lambda}(\theta)=\frac{1}{m}\sum_{i\in I_{\mathrm{tr}}}\omega_{(i)}\bigl(p_i(\theta)-y_i\bigr)\tilde x_i+\lambda\theta,
+\nabla F_{\omega,\lambda}(\theta)=\frac{1}{m}\sum_{i\in I_{\mathrm{tr}}}\omega_{(i)}\bigl(\hat y_i(\theta)-y_i\bigr)\tilde x_i+\lambda\theta,
 \qquad
-\nabla^2 F_{\omega,\lambda}(\theta)=\frac{1}{m}\sum_{i\in I_{\mathrm{tr}}}\omega_{(i)}p_i(\theta)\bigl(1-p_i(\theta)\bigr)\tilde x_i\tilde x_i^\top+\lambda I_p.
+\nabla^2 F_{\omega,\lambda}(\theta)=\frac{1}{m}\sum_{i\in I_{\mathrm{tr}}}\omega_{(i)}\hat y_i(\theta)\bigl(1-\hat y_i(\theta)\bigr)\tilde x_i\tilde x_i^\top+\lambda I_p.
 \]
-Como $0<p_i(1-p_i)\le\frac14$ y $\omega_{(i)}\le\max\{\omega_1,\omega_0\}$, para todo $v\in\mathbb{R}^p$ se obtiene
+Como $0<\hat y_i(1-p_i)\le\frac14$ y $\omega_{(i)}\le\max\{\omega_1,\omega_0\}$, para todo $v\in\mathbb{R}^p$ se obtiene
 \[
 \lambda\|v\|_2^2 \le v^\top\nabla^2 F_{\omega,\lambda}(\theta)v
 \le \frac{\max\{\omega_1,\omega_0\}}{4m}\|\widetilde{X}_{I_{\mathrm{tr}}}v\|_2^2+\lambda\|v\|_2^2 \le L\|v\|_2^2,
 \]
 lo que prueba $\lambda I_p\preceq\nabla^2 F_{\omega,\lambda}(\theta)\preceq LI_p$ y la $L$-Lipschitzianidad global de $\nabla F_{\omega,\lambda}$. Si $\lambda>0$, la $\lambda$-fuerte convexidad implica coercividad y existencia de un único minimizador global $\theta^*$ caracterizado por $\nabla F_{\omega,\lambda}(\theta^*)=0$. Si para algún $k_0\ge 0$ ocurre $g_{k_0}=0$, entonces $\theta_{k_0}=\theta^*$ y el algoritmo termina en dicho paso. Supóngase ahora $g_k\neq 0$ para todo $k\ge 0$; entonces todo paso verifica $s_i\neq 0$ e $y_i=\overline{G}_i s_i$ con $\overline{G}_i:=\int_0^1\nabla^2 F_{\omega,\lambda}(\theta_i+ts_i)\,\dd t$ simétrica y $\lambda I_p\preceq\overline{G}_i\preceq LI_p$, de modo que $\lambda\|s_i\|_2^2\le s_i^\top y_i\le L\|s_i\|_2^2$, $\|y_i\|_2\le L\|s_i\|_2$ y $\lambda(s_i^\top y_i)\le s_i^\top\overline{G}_i^2 s_i=\|y_i\|_2^2\le L(s_i^\top y_i)$, resultando $\gamma_k\in[L^{-1},\lambda^{-1}]$ para todo $k\ge 1$. En cada actualización~\eqref{eq:actualizacion-bfgs} ($H^+=V_i^\top HV_i+\rho_i s_i s_i^\top$ con $H\succ 0$), $\|V_i\|_2\le 1+\rho_i\|y_i\|_2\|s_i\|_2\le 1+\frac{L}{\lambda}$ y $\rho_i\|s_i\|_2^2\le\frac1\lambda$, por lo que $\|H^+\|_2\le\|V_i\|_2^2\|H\|_2+\rho_i\|s_i\|_2^2\le\bigl(1+\frac{L}{\lambda}\bigr)^2\|H\|_2+\frac1\lambda$. Por otra parte, si $B:=H^{-1}\succ 0$ y $P_i:=I_p-\frac{s_i s_i^\top B}{s_i^\top Bs_i}$ (bien definida pues $s_i^\top Bs_i>0$ al ser $B\succ 0$ y $s_i\neq 0$), la matriz $B^+:=BP_i+\rho_i y_i y_i^\top=B-\frac{Bs_is_i^\top B}{s_i^\top Bs_i}+\frac{y_iy_i^\top}{s_i^\top y_i}$ es $(H^+)^{-1}$: como $s_i^\top BP_i=0$, $V_i y_i=0$ y $\rho_i y_i^\top s_i=1$, se tiene $H^+B^+=V_i^\top HV_i BP_i+\rho_i^2(s_i^\top y_i)s_i y_i^\top=V_i^\top P_i+\rho_i s_i y_i^\top=I_p$; además, como $\tr(Bs_i s_i^\top B)=\|Bs_i\|_2^2\ge 0$, resulta $\tr(B^+)\le\tr(B)+\frac{\|y_i\|_2^2}{s_i^\top y_i}\le\tr(B)+L$. Para $k=0$, $H_0=\gamma_0 I_p$ cumple $\kappa_2(B_0)=1$; para $k\ge 1$, aplicando $\ell_k\le M$ actualizaciones desde $H_k^{(0)}=\gamma_k I_p$, tanto $\|H_k\|_2$ como $\|B_k\|_2\le\tr(B_k)\le (p+M)L$ quedan uniformemente acotadas, verificando~\eqref{eq:condicion-uniforme-lbfgs}. Por la Proposición~\ref{prop:convergencia-lbfgs} (Parte~2) se tiene $\|\nabla F_{\omega,\lambda}(\theta_k)\|_2\to 0$; integrando $\nabla^2 F_{\omega,\lambda}\succeq\lambda I_p$ sobre el segmento entre $\theta^*$ y $\theta_k$ y aplicando Cauchy--Schwarz se deduce $\lambda\|\theta_k-\theta^*\|_2\le\|\nabla F_{\omega,\lambda}(\theta_k)-\nabla F_{\omega,\lambda}(\theta^*)\|_2=\|\nabla F_{\omega,\lambda}(\theta_k)\|_2$, luego $\theta_k\to\theta^*$.
 
-\emph{Parte~2.} Como $\sigma_1$ es impar (en particular $\sigma_1(0)=0$, por lo que en $\theta=0$ la matriz de características ocultas se anula, $H^{(1)}=0$, y $p_i(0)=\sigma_{\mathrm{sig}}(0)=\frac12$) y las sumas polinomiales en $S^k$ son lineales en cada bloque $\theta^{(\ell)}$, al cambiar $(\theta^{(1)},\theta^{(2)})\mapsto(-\theta^{(1)},-\theta^{(2)})$ la salida oculta cambia de signo ($H^{(1)}\mapsto -H^{(1)}$) y la preactivación de la segunda capa permanece idéntica ($-H^{(1)}(-W_k^{(2)})=H^{(1)}W_k^{(2)}$), igual que $\|(-\theta^{(1)},-\theta^{(2)})\|_2^2=\|\theta\|_2^2$. Sea $c:=\inf_{\mathbb{R}^p} F_{\omega,\lambda}\ge 0$ y sea $(\theta_r)_{r\in\mathbb{N}}\subset\mathbb{R}^p$ una sucesión minimizante, $F_{\omega,\lambda}(\theta_r)\to c$. Como la función constante $c$ es afín y menor o igual que $F_{\omega,\lambda}$, se cumple $c\le F_{\omega,\lambda}^{**}\le\operatorname{conv}(F_{\omega,\lambda})\le F_{\omega,\lambda}$, de donde $\inf_{\mathbb{R}^p} F_{\omega,\lambda}^{**}=\inf_{\mathbb{R}^p}\operatorname{conv}(F_{\omega,\lambda})=c$. Para toda función convexa $\varphi\le F_{\omega,\lambda}$ con $\inf_{\mathbb{R}^p}\varphi=c$ y todo $r\in\mathbb{N}$,
+\emph{Parte~2.} Como $\sigma_1$ es impar (en particular $\sigma_1(0)=0$, por lo que en $\theta=0$ la matriz de características ocultas se anula, $H^{(1)}=0$, y $\hat y_i(0)=\sigma_{\mathrm{sig}}(0)=\frac12$) y las sumas polinomiales en $S^k$ son lineales en cada bloque $\theta^{(\ell)}$, al cambiar $(\theta^{(1)},\theta^{(2)})\mapsto(-\theta^{(1)},-\theta^{(2)})$ la salida oculta cambia de signo ($H^{(1)}\mapsto -H^{(1)}$) y la preactivación de la segunda capa permanece idéntica ($-H^{(1)}(-W_k^{(2)})=H^{(1)}W_k^{(2)}$), igual que $\|(-\theta^{(1)},-\theta^{(2)})\|_2^2=\|\theta\|_2^2$. Sea $c:=\inf_{\mathbb{R}^p} F_{\omega,\lambda}\ge 0$ y sea $(\theta_r)_{r\in\mathbb{N}}\subset\mathbb{R}^p$ una sucesión minimizante, $F_{\omega,\lambda}(\theta_r)\to c$. Como la función constante $c$ es afín y menor o igual que $F_{\omega,\lambda}$, se cumple $c\le F_{\omega,\lambda}^{**}\le\operatorname{conv}(F_{\omega,\lambda})\le F_{\omega,\lambda}$, de donde $\inf_{\mathbb{R}^p} F_{\omega,\lambda}^{**}=\inf_{\mathbb{R}^p}\operatorname{conv}(F_{\omega,\lambda})=c$. Para toda función convexa $\varphi\le F_{\omega,\lambda}$ con $\inf_{\mathbb{R}^p}\varphi=c$ y todo $r\in\mathbb{N}$,
 \[
 c=\inf_{\mathbb{R}^p}\varphi \le \varphi(0)=\varphi\bigl(\tfrac12\theta_r+\tfrac12(-\theta_r)\bigr)\le \tfrac12\varphi(\theta_r)+\tfrac12\varphi(-\theta_r)\le \tfrac12 F_{\omega,\lambda}(\theta_r)+\tfrac12 F_{\omega,\lambda}(-\theta_r)=F_{\omega,\lambda}(\theta_r);
 \]
@@ -3154,10 +3359,12 @@ $S_{34}$ posee solo $517\,455$ entradas no nulas (densidad $1{,}25\times 10^{-5}
 La arquitectura \texttt{ExplicitGCN} implementada consta de dos capas tipo Kipf--Welling~\cite{kipf2017} ($165\to 32\to 1$) con un único término desplazado $S_t$ por capa —pues el lazo propio ya está incorporado en $A_t+I_n$— y vectores de sesgo $b^{(1)}\in\mathbb{R}^{32}$, $b^{(2)}\in\mathbb{R}$:
 \[
 H^{(1)}=\sigma_1\bigl(S_t X W^{(1)}+\mathbf{1}_n(b^{(1)})^\top\bigr),\qquad
-p(\theta)=\sigma_2\bigl(S_t H^{(1)}W^{(2)}+b^{(2)}\mathbf{1}_n\bigr),
+\hat y(\theta)=\sigma_2\bigl(S_t H^{(1)}W^{(2)}+b^{(2)}\mathbf{1}_n\bigr),
 \]
 donde $\sigma_2(z)=(1+e^{-z})^{-1}$. De este modo, frente al modelo polinomial sin sesgos de la Proposición~\ref{prop:gcnn-parametros}, el vector $\theta\in\mathbb{R}^p$ reúne exactamente
-$p=165\times 32+32+32\times 1+1=5\,345$ parámetros entrenables. Al precalcular una única vez
+$p=165\times 32+32+32\times 1+1=5\,345$ parámetros entrenables. Por sus sesgos y por usar solo el término $S_t$ en cada capa, \texttt{ExplicitGCN} no es un caso de la Definición~\ref{def:gcnn-red}: ni la Proposición~\ref{prop:gcnn-parametros} ni la Parte~2 de la Proposición~\ref{prop:convexidad-una-capa-vs-simetria} se aplican a las corridas de los Cuadros~\ref{tab:lbfgs-elliptic-opt} y~\ref{tab:lbfgs-elliptic-metricas}.
+% Corrección editorial (IA, 2026-11-25): alcance de la teoría frente a ExplicitGCN. review_pending.
+Al precalcular una única vez
 $S_{34}X$ sobre el grafo completo y restringir la segunda capa a la vecindad
 activa de $I_{\mathrm{tr}}$ ($|U|=61\,080$ vértices), cada evaluación exacta de
 la función objetivo y su gradiente en CPU toma alrededor de $110$--$130\,$ms,
@@ -3167,7 +3374,7 @@ finitas centrales ($\varepsilon=10^{-6}$), obteniendo errores relativos máximos
 de $1{,}71\times 10^{-10}$ ($\tanh$) y $1{,}08\times 10^{-10}$ ($\operatorname{ReLU}$).
 
 \paragraph{Criterios de parada y configuraciones evaluadas.}
-Para abarcar de forma unificada la pérdida empírica original $F$ de la Sección~\ref{sec:funcion-perdida}, la corrección del desbalance de clases en Elliptic ($11{,}58\%$ ilícitos frente a $88{,}42\%$ lícitos) y la regularización cuadrática discutidas en la Observación~\ref{obs:hipotesis-gcnn-lbfgs} y la Proposición~\ref{prop:convexidad-una-capa-vs-simetria}, las corridas minimizan la familia $F_{\omega,\lambda}(\theta)$ definida en~\eqref{eq:objetivo-ponderado-l2}, donde $\omega_1,\omega_0>0$ son los pesos de clase (que preservan la equivalencia asintótica $\omega_{\min}F\le F_{\omega,0}\le\omega_{\max}F$ de la Proposición~\ref{prop:caracterizacion-perdida-empirica}, denotados con $\omega$ para distinguirlos de $c_1,c_2$ de Wolfe) y $\frac{\lambda}{2}\|\theta\|_2^2$ penaliza todas las coordenadas de $\theta\in\mathbb{R}^p$, incluidos los sesgos (compactificando $\mathcal{S}$ para cerrar la hipótesis~3 del Teorema~\ref{thm:zoutendijk} y frenando el sobreajuste temporal); para $\omega_1=\omega_0=1$ y $\lambda=0$ se recupera exactamente $F_{1,0}=F$ (evaluada como línea base en la primera fila de los Cuadros~\ref{tab:lbfgs-elliptic-opt} y~\ref{tab:lbfgs-elliptic-metricas}).
+Para abarcar de forma unificada la pérdida empírica original $F$ de la Sección~\ref{sec:funcion-perdida}, la corrección del desbalance de clases en Elliptic ($11{,}58\%$ ilícitos frente a $88{,}42\%$ lícitos) y la regularización cuadrática discutidas en la Observación~\ref{obs:hipotesis-gcnn-lbfgs} y la Proposición~\ref{prop:convexidad-una-capa-vs-simetria}, las corridas minimizan la familia $F_{\omega,\lambda}(\theta)$ definida en~\eqref{eq:objetivo-ponderado-l2}, donde $\omega_1,\omega_0>0$ son los pesos de clase (que preservan la equivalencia asintótica $\omega_{\min}F\le F_{\omega,0}\le\omega_{\max}F$ de la Proposición~\ref{prop:convexidad-una-capa-vs-simetria}, denotados con $\omega$ para distinguirlos de $c_1,c_2$ de Wolfe) y $\frac{\lambda}{2}\|\theta\|_2^2$ penaliza todas las coordenadas de $\theta\in\mathbb{R}^p$, incluidos los sesgos (compactificando $\mathcal{S}$ para cerrar la hipótesis~3 del Teorema~\ref{thm:zoutendijk} y frenando el sobreajuste temporal); para $\omega_1=\omega_0=1$ y $\lambda=0$ se recupera exactamente $F_{1,0}=F$ (evaluada como línea base en la primera fila de los Cuadros~\ref{tab:lbfgs-elliptic-opt} y~\ref{tab:lbfgs-elliptic-metricas}).
 Atendiendo a la exigencia de no detener el algoritmo únicamente por conteo de
 iteraciones, se impuso parada cuando $\|\nabla F_{\omega,\lambda}(\theta_k)\|_2\le 10^{-4}$ o
 cuando el cambio relativo
@@ -3221,7 +3428,7 @@ $\|\nabla F(\theta_k)\|_2$ se conserva en los archivos CSV generados por
 \begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth]{lbfgs_elliptic_zoutendijk.pdf}
-\caption{Verificación numérica del Teorema~\ref{thm:zoutendijk} y del Corolario~\ref{cor:convergencia-global-limite} en Elliptic: evolución de $\cos\psi_{k-1}$, decaimiento del término $\cos^2\psi_{k-1}\|\nabla F(\theta_{k-1})\|_2^2$ y estabilización de la suma parcial acumulada $\sum_{j=0}^{k-1}\cos^2\psi_j\|\nabla F(\theta_j)\|_2^2$ para cada paso $k\ge 1$.}
+\caption{Ilustración numérica, compatible con el Teorema~\ref{thm:zoutendijk} y el Corolario~\ref{cor:convergencia-global-limite}, en Elliptic: evolución de $\cos\psi_{k-1}$, decaimiento del término $\cos^2\psi_{k-1}\|\nabla F(\theta_{k-1})\|_2^2$ y estabilización de la suma parcial acumulada $\sum_{j=0}^{k-1}\cos^2\psi_j\|\nabla F(\theta_j)\|_2^2$ para cada paso $k\ge 1$.}
 \label{fig:lbfgs-elliptic-zoutendijk}
 \end{figure}
 
@@ -3258,7 +3465,9 @@ SciPy L-BFGS-B ($\tanh$, BCE + L2) & --- & --- & 0,3506 & 0,3690 & 0,3129 & 0,44
 \paragraph{Discusión de resultados.}
 Los cuadros~\ref{tab:lbfgs-elliptic-opt}--\ref{tab:lbfgs-elliptic-metricas} y
 las figuras~\ref{fig:lbfgs-elliptic-convergencia}--\ref{fig:lbfgs-elliptic-pr}
-permiten extraer cuatro conclusiones verificables:
+permiten extraer cuatro observaciones:
+% Corrección editorial (IA, 2026-11-25): las conclusiones de §3.3.4 se rebajan a lo que
+% sostienen los datos (ilustración, no verificación). review_pending.
 \begin{enumerate}
 \item \textbf{Convergencia real y eficiencia de L-BFGS:} sobre la pérdida suave
 y regularizada ($\tanh$, BCE + L2), el algoritmo L-BFGS de dos bucles satisface
@@ -3267,28 +3476,33 @@ iteraciones ($227$ evaluaciones, $23{,}50\,$s, con cero reinicios de memoria y
 cero fallos de Wolfe), reduciendo en $3{,}4\times$ el tiempo y en $3{,}0\times$
 las evaluaciones frente al método del gradiente con Wolfe ($80{,}36\,$s, $686$
 evaluaciones, sin alcanzar la tolerancia). La validación cruzada con
-\texttt{SciPy L-BFGS-B} confirma una trayectoria equivalente ($F_{\mathrm{fin}}=0{,}1802$
-al detenerse por norma $\|g_k\|_\infty\le 10^{-4}$).
-\item \textbf{Contraste directo con el Teorema~\ref{thm:zoutendijk}:} en todas
+\texttt{SciPy L-BFGS-B} llega a un valor final próximo ($F_{\mathrm{fin}}=0{,}1802$, frente a $0{,}1791$,
+al detenerse por norma $\|g_k\|_\infty\le 10^{-4}$); solo se comparan los valores finales, no las trayectorias.
+\item \textbf{Comparación con el Teorema~\ref{thm:zoutendijk}:} en todas
 las corridas de L-BFGS el término de Zoutendijk $\cos^2\psi_k\|g_k\|_2^2$ decae
-varios órdenes de magnitud y la suma parcial se estabiliza en un valor finito
-($2{,}595$--$3{,}477$ con $\tanh$; $1{,}259$ con $\operatorname{ReLU}$). Sin
+varios órdenes de magnitud y las sumas parciales de las primeras $300$ iteraciones
+se estabilizan en $2{,}595$--$3{,}477$ con $\tanh$ y en $1{,}259$ con $\operatorname{ReLU}$.
+Una suma parcial finita es finita por construcción, de modo que esto es compatible
+con el teorema, pero no lo verifica. Sin
 regularización ($\lambda=0$), L-BFGS lleva $F(\theta_k)$ desde $0{,}7045$ hasta
-$1{,}07\times 10^{-4}$ en $32{,}56\,$s, pero el conjunto de nivel deja de ser
-acotado y $\cos\psi_k$ desciende hasta $0{,}0216$, evidenciando mal
-condicionamiento progresivo y sobreajuste temporal (PR-AUC en prueba $0{,}2467$).
-Con regularización L2 ($\lambda=5\times 10^{-3}$), $\cos\psi_k$ se mantiene
-acotado inferiormente por encima de $0{,}09$--$0{,}11$ y la generalización en
-prueba aumenta notablemente (PR-AUC $0{,}3435$--$0{,}4509$).
-\item \textbf{Efecto de la no diferenciabilidad de $\operatorname{ReLU}$:} con
+$1{,}07\times 10^{-4}$ en $32{,}56\,$s y el mínimo observado de $\cos\psi_k$ baja a $0{,}0216$;
+esto es compatible con un mal condicionamiento progresivo y con sobreajuste temporal
+(PR-AUC en prueba $0{,}2467$). Que el conjunto de nivel no sea acotado para $\lambda=0$
+es una conjetura: la hipótesis~3 del Teorema~\ref{thm:zoutendijk} queda sin verificar
+(Observación~\ref{obs:hipotesis-gcnn-lbfgs}) y contrastarla exigiría registrar $\|\theta_k\|_2$.
+Con regularización L2 ($\lambda=5\times 10^{-3}$), el mínimo de $\cos\psi_k$ en las corridas
+es $0{,}0915$--$0{,}1145$, lo que no constituye una cota uniforme, y la generalización en
+prueba mejora (PR-AUC $0{,}3435$--$0{,}4509$).
+\item \textbf{$\operatorname{ReLU}$ frente a $\tanh$ con el mismo objetivo:} con
 $\operatorname{ReLU}$ y ponderación por costos se obtiene el mejor desempeño
 predictivo temporal (Val PR-AUC $0{,}7550$, Test PR-AUC $0{,}4509$, Test $F_1=0{,}4833$,
-precisión $67{,}71$\%), pero $\|\nabla F(\theta_k)\|_2$ se estanca en una
-meseta alrededor de $6{,}1\times 10^{-3}$ pese a que el paso relativo baja a
-$1{,}36\times 10^{-4}$, comportamiento típico de los quiebres no diferenciables
-de $\operatorname{ReLU}$, donde falla la hipótesis de clase $C^1$ del
-Teorema~\ref{thm:zoutendijk}. En cambio, con $\tanh$ ($C^\infty$) la norma del
-gradiente desciende limpiamente hasta $7{,}48\times 10^{-5}$.
+precisión $67{,}71$\%), pero al llegar al tope $\|\nabla F(\theta_k)\|_2$ vale
+$6{,}10\times 10^{-3}$, con paso relativo $1{,}36\times 10^{-4}$. Con el mismo objetivo
+(costo + L2), $\tanh$ también se detiene en el tope, con $\|\nabla F(\theta_k)\|_2=1{,}76\times 10^{-3}$;
+el valor $7{,}48\times 10^{-5}$ corresponde a otro objetivo (BCE + L2) y no sirve
+de comparación. Que la diferencia restante se deba a los quiebres de
+$\operatorname{ReLU}$, donde falla la hipótesis de clase $C^1$ del
+Teorema~\ref{thm:zoutendijk}, es una hipótesis plausible que estos datos no aíslan.
 \item \textbf{Impacto del desbalance de clases:} incorporar el peso balanceado
 $\omega_1=7{,}635$ ($\omega_0=1$) junto con $\lambda=5\times 10^{-3}$ eleva el PR-AUC de prueba con
 $\tanh$ de $0{,}3435$ a $0{,}4083$ (y $F_1$ de $0{,}3534$ a $0{,}4465$),
@@ -3301,9 +3515,9 @@ confirmando su utilidad práctica en detección de fraude.
 \paragraph{Contraste entre óptimo global convexo ($L_{\mathrm{net}}=1$), arquitectura ego-separada ($L_{\mathrm{net}}=2$) y suavización $\operatorname{softplus}_\beta$ con \emph{multi-start}.}
 Con el fin de evaluar directamente la Proposición~\ref{prop:convexidad-una-capa-vs-simetria} usando la arquitectura polinomial exacta sin sesgos de la Definición~\ref{def:gcnn-red} y el conteo de parámetros de la Proposición~\ref{prop:gcnn-parametros} ($\omega_1\approx 7{,}635$, $\omega_0=1$, $\lambda=5\times 10^{-3}$, memoria $M=10$ y tope de $300$ iteraciones; \texttt{gcn\_elliptic\_nivel2.py}), se ejecutaron tres regímenes adicionales cuyos gradientes analíticos se verificaron contra diferencias finitas centrales ($\varepsilon=10^{-6}$, error relativo máximo $6{,}57\times 10^{-8}$ en $L_{\mathrm{net}}=1$ y $\le 6{,}12\times 10^{-6}$ en $L_{\mathrm{net}}=2$):
 \begin{enumerate}
-\item \textbf{Modelo FIR convexo de óptimo global ($L_{\mathrm{net}}=1$, $K_1=2$, $p=3\times 165=495$):} precalculando $\widetilde{X}_{34}=[X,S_{34}X,S_{34}^2X]$, se obtiene $\|\widetilde{X}_{I_{\mathrm{tr}}}\|_2=2\,113{,}33$ y cota de Lipschitz global analítica $L=285{,}17$ ($\kappa_2(\nabla^2 F_{\omega,\lambda}(\theta))\le L/\lambda\approx 5{,}70\times 10^4$). L-BFGS alcanza $\|\nabla F_{\omega,\lambda}(\theta_k)\|_2=9{,}58\times 10^{-5}\le 10^{-4}$ en solo $79$ iteraciones ($3{,}32\,$s). Para verificar empíricamente la unicidad del minimizador global $\theta^*$, se repitió la corrida desde $\theta_0=0$ ($77$ iteraciones, $3{,}45\,$s), obteniéndose $|F_{\omega,\lambda}(\hat\theta_{\mathrm{aleat}})-F_{\omega,\lambda}(\hat\theta_0)|=6{,}93\times 10^{-9}$ y $\|\hat\theta_{\mathrm{aleat}}-\hat\theta_0\|_2=4{,}89\times 10^{-3}$. Sin embargo, en dicho único mínimo global el desempeño predictivo temporal se limita a Test PR-AUC $0{,}1725$ ($F_1=0{,}2835$), probando empíricamente que las combinaciones no lineales de una capa oculta ($L_{\mathrm{net}}=2$) son indispensables en detección de fraude.
+\item \textbf{Modelo FIR convexo de óptimo global ($L_{\mathrm{net}}=1$, $K_1=2$, $p=3\times 165=495$):} precalculando $\widetilde{X}_{34}=[X,S_{34}X,S_{34}^2X]$, se obtiene $\|\widetilde{X}_{I_{\mathrm{tr}}}\|_2=2\,113{,}33$ y cota de Lipschitz global analítica $L=285{,}17$ ($\kappa_2(\nabla^2 F_{\omega,\lambda}(\theta))\le L/\lambda\approx 5{,}70\times 10^4$). L-BFGS alcanza $\|\nabla F_{\omega,\lambda}(\theta_k)\|_2=9{,}58\times 10^{-5}\le 10^{-4}$ en solo $79$ iteraciones ($3{,}32\,$s). La unicidad de $\theta^*$ está demostrada en la Parte~1 de la Proposición~\ref{prop:convexidad-una-capa-vs-simetria}; como control numérico, se repitió la corrida desde $\theta_0=0$ ($77$ iteraciones, $3{,}45\,$s), obteniéndose $|F_{\omega,\lambda}(\hat\theta_{\mathrm{aleat}})-F_{\omega,\lambda}(\hat\theta_0)|=6{,}93\times 10^{-9}$ y $\|\hat\theta_{\mathrm{aleat}}-\hat\theta_0\|_2=4{,}89\times 10^{-3}$. La $\lambda$-convexidad fuerte da además la cota a posteriori $\|\theta_k-\theta^*\|_2\le\|\nabla F_{\omega,\lambda}(\theta_k)\|_2/\lambda$, pues $\lambda\|\theta_k-\theta^*\|_2^2\le(\nabla F_{\omega,\lambda}(\theta_k)-\nabla F_{\omega,\lambda}(\theta^*))^\top(\theta_k-\theta^*)$ y $\nabla F_{\omega,\lambda}(\theta^*)=0$; para la primera corrida, $\|\hat\theta_{\mathrm{aleat}}-\theta^*\|_2\le 9{,}58\times 10^{-5}/(5\times 10^{-3})\approx 1{,}9\times 10^{-2}$, coherente con la distancia observada. En ese minimizador global, el desempeño predictivo temporal se limita a Test PR-AUC $0{,}1725$ ($F_1=0{,}2835$). En esta comparación, ello sugiere que la capa oculta no lineal ($L_{\mathrm{net}}=2$) aporta capacidad predictiva relevante para la detección de fraude; una sola comparación no basta para afirmar que sea indispensable.
 \item \textbf{GCNN ego-separada ($L_{\mathrm{net}}=2$, $K_1=K_2=1$, $d_1=32$, $p=2\cdot 165\cdot 32+2\cdot 32=10\,624$):} al separar los pesos del propio vértice ($X W_0^{(1)}$) de la agregación normalizada sobre su vecindad ampliada ($S_t X W_1^{(1)}$) para evitar diluir atributos bajo heterofilia, el valor objetivo desciende de $0{,}3910$ (\texttt{ExplicitGCN}) a $0{,}2067$ con $\tanh$ y a $0{,}2010$--$0{,}2020$ con $\operatorname{softplus}_2$ ($\beta=2$, error uniforme $\frac{\log 2}{2}\approx 0{,}3466$ frente a $\operatorname{ReLU}$). Sobre la misma semilla $42$, sustituir $\tanh$ por $\operatorname{softplus}_2$ evita la saturación positiva y eleva el Val PR-AUC de $0{,}6799$ a $0{,}7401$ y el Test PR-AUC de $0{,}3335$ a $0{,}3964$.
-\item \textbf{Exploración de cuencas locales mediante \emph{multi-start} ($R=5$ semillas $42$--$46$) y ensamblado:} las cinco corridas independientes con $\operatorname{softplus}_2$ convergen hacia cuencas locales geométricamente separadas ($\|\hat\theta^{(r)}-\hat\theta^{(s)}\|_2\in[8{,}16;\,9{,}09]$, frente a $4{,}89\times 10^{-3}$ en el modelo convexo), todas con valores objetivos casi equivalentes ($F_{\mathrm{fin}}\in[0{,}201041;\,0{,}202032]$) y Test $F_1$ individual de hasta $0{,}5128$ (semilla $45$). El ensamble promedio $\bar p_i=\frac15\sum_{r=1}^5 p_i(\hat\theta^{(r)})$ alcanza el mayor PR-AUC de validación de todo el estudio ($0{,}7594$) y eleva el puntaje $F_1$ en prueba temporal a $0{,}5023$ (precisión $60{,}22$\%, exhaustividad $43{,}08$\%), superando en $F_1$ a todas las variantes de un solo modelo del Cuadro~\ref{tab:lbfgs-elliptic-metricas}.
+\item \textbf{Exploración de cuencas locales mediante \emph{multi-start} ($R=5$ semillas $42$--$46$) y ensamblado:} las cinco corridas independientes con $\operatorname{softplus}_2$ se detienen en el tope de iteraciones (con $\|g_k\|_2$ de hasta $7{,}10\times 10^{-3}$) en puntos alejados entre sí ($\|\hat\theta^{(r)}-\hat\theta^{(s)}\|_2\in[8{,}16;\,9{,}09]$, frente a $4{,}89\times 10^{-3}$ en el modelo convexo). Esa distancia no prueba que se trate de cuencas distintas: $F_{\omega,\lambda}$ no cambia al permutar los $32$ canales ocultos (columnas de cada $W_k^{(1)}$ y filas de cada $W_k^{(2)}$), de modo que dos copias permutadas de un mismo punto pueden estar lejos en distancia euclídea; habría que medirla módulo permutaciones. Las cinco corridas tienen valores objetivos casi equivalentes ($F_{\mathrm{fin}}\in[0{,}201041;\,0{,}202032]$) y Test $F_1$ individual de hasta $0{,}5128$ (semilla $45$). El ensamble promedio $\hat y_i^{\mathrm{ens}}=\frac15\sum_{r=1}^5 \hat y_i(\hat\theta^{(r)})$ alcanza el mayor PR-AUC de validación de todo el estudio ($0{,}7594$) y un puntaje $F_1$ en prueba temporal de $0{,}5023$ (precisión $60{,}22$\%, exhaustividad $43{,}08$\%), superior al de todas las variantes de un solo modelo del Cuadro~\ref{tab:lbfgs-elliptic-metricas}, aunque inferior al de la semilla $45$ sola ($0{,}5128$, Cuadro~\ref{tab:lbfgs-elliptic-nivel2}). Elegir esa semilla por su resultado en prueba equivaldría a seleccionar el modelo con el conjunto de prueba; el criterio legítimo es la validación.
 \end{enumerate}
 
 \begin{table}[H]
