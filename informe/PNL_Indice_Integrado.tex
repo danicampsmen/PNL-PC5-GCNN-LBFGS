@@ -775,7 +775,8 @@ Asimismo, mediante la descomposición espectral de \(S\), se definirá la transf
 \begin{definicion}[Distancia entre vértices y vecindad de $k$ saltos]\label{def:distancia-saltos}
 Sea \(G=(V,E,A)\) un grafo no dirigido ponderado, con \(V=\{v_1,\ldots,v_n\}\).
 
-Un \emph{camino de longitud \(r\)} entre \(v_i\) y \(v_j\) es una sucesión de vértices
+% Corrección editorial (IA, 2026-11-25, auditoría PC5): se trata de un paseo (walk); inocuo para la distancia. review_pending.
+Un \emph{camino de longitud \(r\)} (en sentido amplio: se admiten vértices repetidos) entre \(v_i\) y \(v_j\) es una sucesión de vértices
 
 \[
 v_{i_0},v_{i_1},\ldots,v_{i_r}
@@ -802,7 +803,8 @@ d_G(v_i,v_j)=
 \text{ entre }v_i\text{ y }v_j\}.
 \]
 
-Si no existe un camino entre ambos vértices, se establece \(d_G(v_i,v_j)=+\infty\). Como el grafo es no dirigido, todo camino puede recorrerse en sentido inverso y, por tanto, \(d_G(v_i,v_j)=d_G(v_j,v_i)\), incluso cuando ambas distancias son infinitas. Asimismo, por concatenación de caminos (y con la convención \(a+(+\infty)=+\infty\) en \(\mathbb N_0\cup\{+\infty\}\)), se cumple la desigualdad triangular \(d_G(v_i,v_j)\le d_G(v_i,v_r)+d_G(v_r,v_j)\) para cualesquiera \(v_i,v_r,v_j\in V\). La matriz de distancias es simétrica y sus entradas pueden valer \(+\infty\). En particular,
+% Corrección editorial (IA, 2026-11-25, auditoría PC5): d(v_i,v_i)=0 no se sigue de la simetría. Original: «En particular,». review_pending.
+Si no existe un camino entre ambos vértices, se establece \(d_G(v_i,v_j)=+\infty\). Como el grafo es no dirigido, todo camino puede recorrerse en sentido inverso y, por tanto, \(d_G(v_i,v_j)=d_G(v_j,v_i)\), incluso cuando ambas distancias son infinitas. Asimismo, por concatenación de caminos (y con la convención \(a+(+\infty)=+\infty\) en \(\mathbb N_0\cup\{+\infty\}\)), se cumple la desigualdad triangular \(d_G(v_i,v_j)\le d_G(v_i,v_r)+d_G(v_r,v_j)\) para cualesquiera \(v_i,v_r,v_j\in V\). La matriz de distancias es simétrica y sus entradas pueden valer \(+\infty\). Como la sucesión formada solo por $v_i$ es un camino de longitud $0$,
 % Corrección editorial (IA, 2026-11-25): se suprime «aunque sus entradas no tienen por qué ser iguales». review_pending.
 
 \[
@@ -1611,9 +1613,11 @@ En consecuencia, identificando $X=x_{\mathrm{obs}}$ y $S=s_{\mathrm{obs}}$ en el
 \hat y(\theta):=\Phi(X;S,\theta)
 =
 \begin{pmatrix}
-p_1(\theta)\\
+% Corrección editorial (IA, 2026-11-25, auditoría PC5): componentes p_i(theta) renombradas \hat y_i(theta) (p = dim theta). review_pending.
+\hat y_1(\theta)\\
 \vdots\\
-p_n(\theta)
+% Corrección editorial (IA, 2026-11-25, auditoría PC5): idem. review_pending.
+\hat y_n(\theta)
 \end{pmatrix}
 \in(0,1)^{n\times 1}.
 \]
@@ -2099,12 +2103,14 @@ Utilizando la matriz $H_k$, calcular
 
 \noindent\textbf{Paso 3. Cálculo del siguiente iterado.}
 
-Elegimos un tamaño de paso \(\alpha_k>0\) (por ejemplo, mediante condiciones de Wolfe; véase la Definición~\ref{def:lbfgs-wolfe}) tal que
+% Corrección editorial (IA, 2026-11-25, auditoría PC5): referencia adelantada. review_pending.
+Elegimos un tamaño de paso \(\alpha_k>0\) (por ejemplo, mediante condiciones de Wolfe; véase más adelante la Definición~\ref{def:lbfgs-wolfe}) tal que
 \[
 F(\theta_k+\alpha_kd_k)<F(\theta_k) \quad \text{y} \quad \nabla F(\theta_k+\alpha_kd_k)^\top d_k
 >g_k^\top d_k.
 \]
-Si $F$ es de clase $C^1$, está acotada inferiormente y $g_k^\top d_k<0$, tal $\alpha_k$ existe: cualquier paso que cumpla las condiciones de Wolfe sirve (Lema~\ref{lem:existencia-wolfe}). Con $F$ solo diferenciable puede no existir; por ejemplo, si $F$ es afín no constante, $\nabla F(\theta_k+\alpha d_k)^\top d_k=g_k^\top d_k$ para todo $\alpha$.
+% Corrección editorial (IA, 2026-11-25, auditoría PC5): el fallo se debe a la falta de cota inferior, no a la regularidad (una F afín es C^infty). Original: «Con $F$ solo diferenciable puede no existir». review_pending.
+Si $F$ es de clase $C^1$, está acotada inferiormente y $g_k^\top d_k<0$, tal $\alpha_k$ existe: cualquier paso que cumpla las condiciones de Wolfe sirve (Lema~\ref{lem:existencia-wolfe}). Si $F$ no está acotada inferiormente a lo largo del rayo $\{\theta_k+\alpha d_k:\alpha>0\}$, el paso puede no existir; por ejemplo, si $F$ es afín no constante, $\nabla F(\theta_k+\alpha d_k)^\top d_k=g_k^\top d_k$ para todo $\alpha$.
 % Corrección editorial (IA, 2026-11-25), revisión de coherencia: review_pending.
 
 Una vez elegido \(\alpha_k\), calculamos el siguiente iterado:
@@ -2490,7 +2496,7 @@ Como $H_0=\gamma_0I_p$, calculamos directamente la dirección
     d_0=-\gamma_0g_0.
 \]
 
-Elegimos un tamaño de paso $\alpha_0>0$ (por ejemplo, mediante condiciones de Wolfe; véase la Definición~\ref{def:lbfgs-wolfe}) tal que
+Elegimos un tamaño de paso $\alpha_0>0$ (por ejemplo, mediante condiciones de Wolfe; véase más adelante la Definición~\ref{def:lbfgs-wolfe}) tal que
 \[
     F(\theta_0+\alpha_0 d_0)<F(\theta_0)
 \]
@@ -2499,7 +2505,8 @@ y
     \nabla F(\theta_0+\alpha_0 d_0)^\top d_0
     >g_0^\top d_0.
 \]
-Si $F$ es de clase $C^1$, está acotada inferiormente y $g_0^\top d_0<0$, tal $\alpha_0$ existe: cualquier paso que cumpla las condiciones de Wolfe sirve (Lema~\ref{lem:existencia-wolfe}). Con $F$ solo diferenciable puede no existir; por ejemplo, si $F$ es afín no constante, $\nabla F(\theta_0+\alpha d_0)^\top d_0=g_0^\top d_0$ para todo $\alpha$.
+% Corrección editorial (IA, 2026-11-25, auditoría PC5): el fallo se debe a la falta de cota inferior, no a la regularidad (una F afín es C^infty). Original: «Con $F$ solo diferenciable puede no existir». review_pending.
+Si $F$ es de clase $C^1$, está acotada inferiormente y $g_0^\top d_0<0$, tal $\alpha_0$ existe: cualquier paso que cumpla las condiciones de Wolfe sirve (Lema~\ref{lem:existencia-wolfe}). Si $F$ no está acotada inferiormente a lo largo del rayo $\{\theta_0+\alpha d_0:\alpha>0\}$, el paso puede no existir; por ejemplo, si $F$ es afín no constante, $\nabla F(\theta_0+\alpha d_0)^\top d_0=g_0^\top d_0$ para todo $\alpha$.
 % Corrección editorial (IA, 2026-11-25), revisión de coherencia: review_pending.
 
 Calculamos el siguiente iterado
@@ -2617,7 +2624,7 @@ Tomamos
 Por la Proposición \ref{prop:propiedades-lbfgs},
 $d_k$ es una dirección de descenso.
 
-Elegimos un tamaño de paso $\alpha_k>0$ (por ejemplo, mediante condiciones de Wolfe; véase la Definición~\ref{def:lbfgs-wolfe}) tal que
+Elegimos un tamaño de paso $\alpha_k>0$ (por ejemplo, mediante condiciones de Wolfe; véase más adelante la Definición~\ref{def:lbfgs-wolfe}) tal que
 \[
     F(\theta_k+\alpha_k d_k)<F(\theta_k)
 \]
@@ -2626,7 +2633,8 @@ y
     \nabla F(\theta_k+\alpha_k d_k)^\top d_k
     >g_k^\top d_k.
 \]
-Si $F$ es de clase $C^1$, está acotada inferiormente y $g_k^\top d_k<0$, tal $\alpha_k$ existe: cualquier paso que cumpla las condiciones de Wolfe sirve (Lema~\ref{lem:existencia-wolfe}). Con $F$ solo diferenciable puede no existir; por ejemplo, si $F$ es afín no constante, $\nabla F(\theta_k+\alpha d_k)^\top d_k=g_k^\top d_k$ para todo $\alpha$.
+% Corrección editorial (IA, 2026-11-25, auditoría PC5): el fallo se debe a la falta de cota inferior, no a la regularidad (una F afín es C^infty). Original: «Con $F$ solo diferenciable puede no existir». review_pending.
+Si $F$ es de clase $C^1$, está acotada inferiormente y $g_k^\top d_k<0$, tal $\alpha_k$ existe: cualquier paso que cumpla las condiciones de Wolfe sirve (Lema~\ref{lem:existencia-wolfe}). Si $F$ no está acotada inferiormente a lo largo del rayo $\{\theta_k+\alpha d_k:\alpha>0\}$, el paso puede no existir; por ejemplo, si $F$ es afín no constante, $\nabla F(\theta_k+\alpha d_k)^\top d_k=g_k^\top d_k$ para todo $\alpha$.
 % Corrección editorial (IA, 2026-11-25), revisión de coherencia: review_pending.
 
 Una vez elegido $\alpha_k$, calculamos
@@ -3240,7 +3248,8 @@ diferenciable en los hiperplanos donde alguna preactivación se anula.
 \item \textbf{Acotación uniforme del número de condición:} en problemas no
 convexos no existe una garantía \emph{a priori} de que $\kappa_2(B_k)\le\Delta$
 se mantenga acotado sin hipótesis adicionales (como convexidad fuerte); en la
-práctica se incorpora una salvaguarda que reinicia la memoria a $-g_k$ si
+% Corrección editorial (IA, 2026-11-25, auditoría PC5): precisión de la salvaguarda. Original: «reinicia la memoria a $-g_k$». review_pending.
+práctica se incorpora una salvaguarda que vacía la memoria y toma $d_k=-g_k$ si
 falla la curvatura positiva $s_k^\top y_k>0$ o el descenso.
 \item \textbf{Tipo de solución:} el límite~\eqref{eq:limite-gradiente-cero}
 garantiza convergencia a puntos estacionarios, no necesariamente a minimizadores
@@ -3297,7 +3306,8 @@ garantizando las hipótesis~1--3 del Teorema~\ref{thm:zoutendijk} para $F_{\omeg
 \qquad
 \nabla^2 F_{\omega,\lambda}(\theta)=\frac{1}{m}\sum_{i\in I_{\mathrm{tr}}}\omega_{(i)}\hat y_i(\theta)\bigl(1-\hat y_i(\theta)\bigr)\tilde x_i\tilde x_i^\top+\lambda I_p.
 \]
-Como $0<\hat y_i(1-p_i)\le\frac14$ y $\omega_{(i)}\le\max\{\omega_1,\omega_0\}$, para todo $v\in\mathbb{R}^p$ se obtiene
+% Corrección editorial (IA, 2026-11-25, auditoría PC5): errata p_i -> \hat y_i. review_pending.
+Como $0<\hat y_i(1-\hat y_i)\le\frac14$ y $\omega_{(i)}\le\max\{\omega_1,\omega_0\}$, para todo $v\in\mathbb{R}^p$ se obtiene
 \[
 \lambda\|v\|_2^2 \le v^\top\nabla^2 F_{\omega,\lambda}(\theta)v
 \le \frac{\max\{\omega_1,\omega_0\}}{4m}\|\widetilde{X}_{I_{\mathrm{tr}}}v\|_2^2+\lambda\|v\|_2^2 \le L\|v\|_2^2,
@@ -3375,7 +3385,8 @@ finitas centrales ($\varepsilon=10^{-6}$), obteniendo errores relativos máximos
 de $1{,}71\times 10^{-10}$ ($\tanh$) y $1{,}08\times 10^{-10}$ ($\operatorname{ReLU}$).
 
 \paragraph{Criterios de parada y configuraciones evaluadas.}
-Para abarcar de forma unificada la pérdida empírica original $F$ de la Sección~\ref{sec:funcion-perdida}, la corrección del desbalance de clases en Elliptic ($11{,}58\%$ ilícitos frente a $88{,}42\%$ lícitos) y la regularización cuadrática discutidas en la Observación~\ref{obs:hipotesis-gcnn-lbfgs} y la Proposición~\ref{prop:convexidad-una-capa-vs-simetria}, las corridas minimizan la familia $F_{\omega,\lambda}(\theta)$ definida en~\eqref{eq:objetivo-ponderado-l2}, donde $\omega_1,\omega_0>0$ son los pesos de clase (que preservan la equivalencia asintótica $\omega_{\min}F\le F_{\omega,0}\le\omega_{\max}F$ de la Proposición~\ref{prop:convexidad-una-capa-vs-simetria}, denotados con $\omega$ para distinguirlos de $c_1,c_2$ de Wolfe) y $\frac{\lambda}{2}\|\theta\|_2^2$ penaliza todas las coordenadas de $\theta\in\mathbb{R}^p$, incluidos los sesgos (compactificando $\mathcal{S}$ para cerrar la hipótesis~3 del Teorema~\ref{thm:zoutendijk} y frenando el sobreajuste temporal); para $\omega_1=\omega_0=1$ y $\lambda=0$ se recupera exactamente $F_{1,0}=F$ (evaluada como línea base en la primera fila de los Cuadros~\ref{tab:lbfgs-elliptic-opt} y~\ref{tab:lbfgs-elliptic-metricas}).
+% Corrección editorial (IA, 2026-11-25, auditoría PC5): la desigualdad es global, no asintótica. Original: «equivalencia asintótica». review_pending.
+Para abarcar de forma unificada la pérdida empírica original $F$ de la Sección~\ref{sec:funcion-perdida}, la corrección del desbalance de clases en Elliptic ($11{,}58\%$ ilícitos frente a $88{,}42\%$ lícitos) y la regularización cuadrática discutidas en la Observación~\ref{obs:hipotesis-gcnn-lbfgs} y la Proposición~\ref{prop:convexidad-una-capa-vs-simetria}, las corridas minimizan la familia $F_{\omega,\lambda}(\theta)$ definida en~\eqref{eq:objetivo-ponderado-l2}, donde $\omega_1,\omega_0>0$ son los pesos de clase (que preservan la equivalencia uniforme $\omega_{\min}F\le F_{\omega,0}\le\omega_{\max}F$ de la Proposición~\ref{prop:convexidad-una-capa-vs-simetria}, denotados con $\omega$ para distinguirlos de $c_1,c_2$ de Wolfe) y $\frac{\lambda}{2}\|\theta\|_2^2$ penaliza todas las coordenadas de $\theta\in\mathbb{R}^p$, incluidos los sesgos (compactificando $\mathcal{S}$ para cerrar la hipótesis~3 del Teorema~\ref{thm:zoutendijk} y frenando el sobreajuste temporal); para $\omega_1=\omega_0=1$ y $\lambda=0$ se recupera exactamente $F_{1,0}=F$ (evaluada como línea base en la primera fila de los Cuadros~\ref{tab:lbfgs-elliptic-opt} y~\ref{tab:lbfgs-elliptic-metricas}).
 Atendiendo a la exigencia de no detener el algoritmo únicamente por conteo de
 iteraciones, se impuso parada cuando $\|\nabla F_{\omega,\lambda}(\theta_k)\|_2\le 10^{-4}$ o
 cuando el cambio relativo
@@ -3492,8 +3503,10 @@ esto es compatible con un mal condicionamiento progresivo y con sobreajuste temp
 es una conjetura: la hipótesis~3 del Teorema~\ref{thm:zoutendijk} queda sin verificar
 (Observación~\ref{obs:hipotesis-gcnn-lbfgs}) y contrastarla exigiría registrar $\|\theta_k\|_2$.
 Con regularización L2 ($\lambda=5\times 10^{-3}$), el mínimo de $\cos\psi_k$ en las corridas
-es $0{,}0915$--$0{,}1145$, lo que no constituye una cota uniforme, y la generalización en
-prueba mejora (PR-AUC $0{,}3435$--$0{,}4509$).
+% Corrección editorial (IA, 2026-11-25, auditoría PC5): precisar la comparación (solo (i)->(ii) aísla lambda). review_pending.
+es $0{,}0915$--$0{,}1145$, lo que no constituye una cota uniforme, y, frente a $\lambda=0$ (PR-AUC $0{,}2467$), la generalización en
+% Corrección editorial (IA, 2026-11-25, auditoría PC5): idem. review_pending.
+prueba mejora a $0{,}3435$ con los mismos pesos $\omega_1=\omega_0=1$; el rango $0{,}3435$--$0{,}4509$ de las demás corridas mezcla además el cambio de ponderación.
 \item \textbf{$\operatorname{ReLU}$ frente a $\tanh$ con el mismo objetivo:} con
 $\operatorname{ReLU}$ y ponderación por costos se obtiene el mejor desempeño
 predictivo temporal (Val PR-AUC $0{,}7550$, Test PR-AUC $0{,}4509$, Test $F_1=0{,}4833$,
@@ -3507,7 +3520,8 @@ Teorema~\ref{thm:zoutendijk}, es una hipótesis plausible que estos datos no aí
 \item \textbf{Impacto del desbalance de clases:} incorporar el peso balanceado
 $\omega_1=7{,}635$ ($\omega_0=1$) junto con $\lambda=5\times 10^{-3}$ eleva el PR-AUC de prueba con
 $\tanh$ de $0{,}3435$ a $0{,}4083$ (y $F_1$ de $0{,}3534$ a $0{,}4465$),
-confirmando su utilidad práctica en detección de fraude.
+% Corrección editorial (IA, 2026-11-25, auditoría PC5): una sola corrida no confirma. Original: «confirmando su utilidad práctica». review_pending.
+lo que sugiere su utilidad práctica en detección de fraude (una semilla y una partición temporal).
 \end{enumerate}
 
 % Procedencia: experimento adicional Nivel 2 (IA, Antigravity, 2026-11-24;
@@ -3538,7 +3552,8 @@ GCNN ego-sep.\ ($L_{\mathrm{net}}=2, K_\ell=1$, $\operatorname{softplus}_2$, s42
 GCNN ego-sep.\ ($\operatorname{softplus}_2$, mejor val.\ s44) & 10\,624 & 300 & 177,21 & 0,201577 & $7{,}10\times 10^{-3}$ & 0,7480 & 0,3850 & 0,5014 & 0,5935 \\
 GCNN ego-sep.\ ($\operatorname{softplus}_2$, s45 máx.\ Test) & 10\,624 & 300 & 192,92 & 0,201833 & $2{,}36\times 10^{-3}$ & 0,7066 & 0,4159 & 0,5128 & 0,5832 \\
 \midrule
-Ensamble \emph{multi-start} ($R=5$, $\operatorname{softplus}_2$) & $5\times 10\,624$ & $5\times 300$ & 982,33 & --- & --- & \textbf{0,7594} & 0,4022 & \textbf{0,5023} & 0,6022 \\
+% Corrección editorial (IA, 2026-11-25, auditoría PC5): 0,5023 no es el máximo de Test F1 (semilla 45: 0,5128); se quita la negrita. review_pending.
+Ensamble \emph{multi-start} ($R=5$, $\operatorname{softplus}_2$) & $5\times 10\,624$ & $5\times 300$ & 982,33 & --- & --- & \textbf{0,7594} & 0,4022 & 0,5023 & 0,6022 \\
 \bottomrule
 \end{tabular}%
 }
